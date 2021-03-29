@@ -1,0 +1,10 @@
+@test hand_rank((A♣, K♡, Q♢, J♠, T♢)) == 1600 # Ace-High Straight
+@test hand_rank((K♣, Q♡, J♢, T♠, 9♢)) == 1601 # King-High Straight
+@test hand_rank((Q♣, J♡, T♢, 9♠, 8♢)) == 1602 # Queen-High Straight
+@test hand_rank((J♣, T♡, 9♢, 8♠, 7♢)) == 1603 # Jack-High Straight
+@test hand_rank((T♣, 9♡, 8♢, 7♠, 6♢)) == 1604 # Ten-High Straight
+@test hand_rank((9♣, 8♡, 7♢, 6♠, 5♢)) == 1605 # Nine-High Straight
+@test hand_rank((8♣, 7♡, 6♢, 5♠, 4♢)) == 1606 # Eight-High Straight
+@test hand_rank((7♣, 6♡, 5♢, 4♠, 3♢)) == 1607 # Seven-High Straight
+@test hand_rank((6♣, 5♡, 4♢, 3♠, 2♢)) == 1608 # Six-High Straight
+@test hand_rank((5♣, 4♡, 3♢, 2♠, A♢)) == 1609 # Five-High Straight
