@@ -1,6 +1,6 @@
 module HoldemHandEvaluator
 
-using HoldemCards
+using PlayingCards
 using Combinatorics
 
 export hand_rank

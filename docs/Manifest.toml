@@ -40,16 +40,8 @@ version = "0.26.3"
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
-[[HoldemCards]]
-deps = ["Random", "Test"]
-git-tree-sha1 = "fa87da35999bed73a9a48eb44cab90b921119129"
-repo-rev = "main"
-repo-url = "https://github.com/charleskawczynski/HoldemCards.jl"
-uuid = "ecfe714a-bcc2-4d11-ad00-25525ff8f984"
-version = "0.1.0"
-
 [[HoldemHandEvaluator]]
-deps = ["BenchmarkTools", "Combinatorics", "Test"]
+deps = ["BenchmarkTools", "Combinatorics", "PlayingCards", "Test"]
 path = ".."
 uuid = "18ed25b1-892a-4a3b-b8fc-1036dc9a6a89"
 version = "0.1.0"
@@ -122,6 +114,14 @@ version = "1.1.0"
 [[Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+
+[[PlayingCards]]
+deps = ["Random", "Test"]
+git-tree-sha1 = "850a44d12f6a4746c8e2183150495f393bb75a19"
+repo-rev = "main"
+repo-url = "https://github.com/charleskawczynski/PlayingCards.jl"
+uuid = "ecfe714a-bcc2-4d11-ad00-25525ff8f984"
+version = "0.1.0"
 
 [[Printf]]
 deps = ["Unicode"]
