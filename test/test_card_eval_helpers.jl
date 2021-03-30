@@ -1,6 +1,6 @@
 using Test
 using HoldemHandEvaluator
-using HoldemCards
+using PlayingCards
 using BenchmarkTools
 const HHE = HoldemHandEvaluator
 
