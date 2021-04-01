@@ -60,7 +60,7 @@ hand_rank(v::Vector) = hand_rank(Tuple(v))
 ##### Rows 1:10 (Straight flush)
 #####
 
-for (i,R) in enumerate(typeof.(rank_list()[end:-1:1])[1:end-3])
+for (i,R) in enumerate(typeof.(ranks()[end:-1:1])[1:end-3])
 @eval hand_rank(::Tuple{
     Card{$R,S},
     Card{type_dn($R,1),S},
@@ -112,7 +112,7 @@ hand_rank(::Tuple{Card{R3,S1},Card{R3,S2},Card{R3,S3},Card{R2,S4},Card{R2,S5}}) 
 
 consecutive(tup) = all(ntuple(i->tup[i]+1==tup[i+1], 4))
 function is_straight(cards)
-    ranks = sort(collect(value.(rank_type.(cards))))
+    ranks = sort(collect(high_value.(rank_type.(cards))))
     ranks_low = sort(collect(low_value.(rank_type.(cards))))
     high_straight = consecutive(ranks)
     low_straight = consecutive(ranks_low)
@@ -121,10 +121,10 @@ end
 
 let k = 1
     club_combos = combinations(filter(x->suit(x) isa Club, full_deck()), 5)
-    sorted_club_combos = sort.(club_combos; by = x->value(x), rev=true)
+    sorted_club_combos = sort.(club_combos; by = x->high_value(x), rev=true)
     sorted_club_combos = sort(sorted_club_combos;
         by=x->begin
-            vals = value.(x)
+            vals = high_value.(x)
             sum(vals[1]*100000+vals[2]*10000+vals[3]*1000+vals[4]*100+vals[5])
         end,
         rev=true
@@ -152,7 +152,7 @@ end
 ##### Rows 1600:1609 (offsuit straight)
 #####
 
-for (i,R) in enumerate(typeof.(rank_list()[end:-1:1])[1:end-3])
+for (i,R) in enumerate(typeof.(ranks()[end:-1:1])[1:end-3])
 @eval hand_rank(::Tuple{
     Card{$R,S1},
     Card{type_dn($R,1),S2},
@@ -173,15 +173,15 @@ hand_rank(::Tuple{Card{R3,S1},Card{R3,S2},Card{R3,S3},Card{R1,S4},Card{R2,S5}}) 
 let k = 1
     club_deck = filter(x->suit(x) isa Club, full_deck())
     club_kicker_combos = collect(combinations(club_deck, 2))
-    sorted_club_kicker_combos = sort.(club_kicker_combos; by = x->value(x), rev=true)
+    sorted_club_kicker_combos = sort.(club_kicker_combos; by = x->high_value(x), rev=true)
     sorted_club_kicker_combos = sort(sorted_club_kicker_combos;
         by=x->begin
-            vals = value.(x)
+            vals = high_value.(x)
             sum(vals[1]*100+vals[2])
         end,
         rev=true
     )
-    for rank_trips in sort(collect(rank_list()); by=x->value(x), rev=true)
+    for rank_trips in sort(collect(ranks()); by=x->high_value(x), rev=true)
         for kickers in sorted_club_kicker_combos
             R3 = typeof(rank_trips)
             Rks = rank.(kickers)
@@ -208,17 +208,17 @@ end
 let k = 1
     half_deck = filter(x->suit(x) isa Club || suit(x) isa Heart, full_deck())
     combos = collect(combinations(half_deck, 4))
-    combos = sort.(combos; by = x->value(x), rev=true)
-    two_pair_combos = filter(x->value(x[1])==value(x[2]) && value(x[3])==value(x[4]), combos)
+    combos = sort.(combos; by = x->high_value(x), rev=true)
+    two_pair_combos = filter(x->high_value(x[1])==high_value(x[2]) && high_value(x[3])==high_value(x[4]), combos)
     sorted_two_pair_combos = sort(two_pair_combos;
         by=x->begin
-            vals = value.(x)
+            vals = high_value.(x)
             sum(vals[1]*100+vals[3])
         end,
         rev=true
     )
     for rank_2_pair in sorted_two_pair_combos
-        for kickers in sort(collect(rank_list()); by=x->value(x), rev=true)
+        for kickers in sort(collect(ranks()); by=x->high_value(x), rev=true)
             R1 = typeof(rank(rank_2_pair[1]))
             R2 = typeof(rank(rank_2_pair[3]))
             Rk = typeof(kickers)
@@ -242,16 +242,16 @@ end
 let k = 1
     three_quarters_deck = filter(x->suit(x) isa Club, full_deck())
     combos = collect(combinations(three_quarters_deck, 3))
-    combos = sort.(combos; by = x->value(x), rev=true)
+    combos = sort.(combos; by = x->high_value(x), rev=true)
     combos = sort(combos;
         by=x->begin
-            vals = value.(x)
+            vals = high_value.(x)
             sum(vals[1]*1000+vals[2]*100+vals[3])
         end,
         rev=true
     )
 
-    for RP in typeof.(rank_list()[end:-1:1])
+    for RP in typeof.(ranks()[end:-1:1])
         for kickers in combos
             R1 = typeof(rank(kickers[1]))
             R2 = typeof(rank(kickers[2]))
@@ -277,10 +277,10 @@ end
 let k = 1
     club_deck = filter(x->suit(x) isa Club, full_deck())
     combos = collect(combinations(club_deck, 5))
-    combos = sort.(combos; by = x->value(x), rev=true)
+    combos = sort.(combos; by = x->high_value(x), rev=true)
     combos = sort(combos;
         by=x->begin
-            vals = value.(x)
+            vals = high_value.(x)
             sum(vals[1]*100000+vals[2]*10000+vals[3]*1000+vals[4]*100+vals[5])
         end,
         rev=true
