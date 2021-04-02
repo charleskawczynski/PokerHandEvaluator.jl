@@ -39,4 +39,17 @@ type_dn(::Type{T}, ::Val{N}) where {T, N} = type_dn(dn_type(T), Val(N-1))
 
 include("hand_eval.jl")
 
+function _precompile_()
+    # avoid running precompile statements when the package isn't precompiling:
+    ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
+
+    for i in 1:7462
+        1 ≤ i ≤ 10 &&      Base.precompile(hand_rank_flush   , (Val{i},))
+        11 ≤ i ≤ 322 &&    Base.precompile(hand_rank_offsuit , (Val{i},))
+        323 ≤ i ≤ 1599 &&  Base.precompile(hand_rank_flush   , (Val{i},))
+        1600 ≤ i ≤ 7462 && Base.precompile(hand_rank_offsuit , (Val{i},))
+    end
+end
+_precompile_()
+
 end # module
