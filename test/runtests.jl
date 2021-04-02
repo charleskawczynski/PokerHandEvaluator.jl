@@ -30,4 +30,3 @@ end
 @testset "Test high card (Ranks 6186:7462)" begin
     include("test_high_card.jl")
 end
-

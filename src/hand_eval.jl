@@ -30,9 +30,13 @@ end
 
 hand_rank(v::Vector) = hand_rank(Tuple(v))
 
-function sort_combinations(comb)
-    coeffs = (10 .^ (length(comb[1]):-1:2)..., 1)
-    return sort(comb; by=x->dot(high_value.(x), coeffs), rev=true)
+function sort_combinations(comb, sort_by_first_val = false)
+    if length(comb[1])==1 || sort_by_first_val
+        return sort(comb; by=x->high_value(x[1]), rev=true)
+    else
+        coeffs = (10 .^ (length(comb[1]):-1:2)..., 1)
+        return sort(comb; by=x->dot(high_value.(x), coeffs), rev=true)
+    end
 end
 
 #####
@@ -55,14 +59,12 @@ let k = 1
     sorted_quads_combos = filter(sorted_quads_combos) do x
         high_value(x[1])==high_value(x[2])==high_value(x[3])==high_value(x[4])
     end
-    sorted_quads_combos = sort(sorted_quads_combos; by=x->high_value(x[1]), rev=true)
+    sorted_quads_combos = sort_combinations(sorted_quads_combos)
     for quads in sorted_quads_combos
         for kicker in ranks()[end:-1:1]
             card_ranks = (rank.(quads)..., kicker)
             card_ranks[1] == card_ranks[5] && continue
             p = prod(prime.(card_ranks))
-
-            # @show string.(card_ranks), p, 11+k-1
             @eval hand_rank_offsuit(::Val{$p}) = 11+$k-1
             k+=1
         end
@@ -88,26 +90,13 @@ let k = 1
     sorted_trip_combos = filter(trip_combos) do x
         high_value(x[1])==high_value(x[2])==high_value(x[3])
     end
-    sorted_trip_combos = sort(sorted_trip_combos;
-        by=x->begin
-            vals = high_value.(x)
-            vals[1]
-        end,
-        rev=true
-    )
-    sorted_pair_combos = sort(sorted_pair_combos;
-        by=x->begin
-            vals = high_value.(x)
-            vals[1]
-        end,
-        rev=true
-    )
+    sorted_trip_combos = sort_combinations(sorted_trip_combos, true)
+    sorted_pair_combos = sort_combinations(sorted_pair_combos, true)
     for tc in sorted_trip_combos
         for pc in sorted_pair_combos
             rank(tc[1]) == rank(pc[1]) && continue
             hand = (tc..., pc...)
             p = prod(prime.(hand))
-            # @show string.(hand), p, 167+k-1
             @eval hand_rank_offsuit(::Val{$p}) = 167+$k-1
             k+=1
         end
@@ -130,13 +119,7 @@ end
 let k = 1
     club_combos = combinations(filter(x->suit(x) isa Club, full_deck()), 5)
     sorted_club_combos = sort.(club_combos; by = x->high_value(x), rev=true)
-    sorted_club_combos = sort(sorted_club_combos;
-        by=x->begin
-            vals = high_value.(x)
-            sum(vals[1]*100000+vals[2]*10000+vals[3]*1000+vals[4]*100+vals[5])
-        end,
-        rev=true
-    )
+    sorted_club_combos = sort_combinations(sorted_club_combos)
     for cards in sorted_club_combos
         is_straight(cards) && continue
         p = prod(prime.(cards))
@@ -164,13 +147,7 @@ let k = 1
     club_deck = filter(x->suit(x) isa Club, full_deck())
     club_kicker_combos = collect(combinations(club_deck, 2))
     sorted_club_kicker_combos = sort.(club_kicker_combos; by = x->high_value(x), rev=true)
-    sorted_club_kicker_combos = sort(sorted_club_kicker_combos;
-        by=x->begin
-            vals = high_value.(x)
-            sum(vals[1]*100+vals[2])
-        end,
-        rev=true
-    )
+    sorted_club_kicker_combos = sort_combinations(sorted_club_kicker_combos)
     for rank_trips in sort(collect(ranks()); by=x->high_value(x), rev=true)
         for kickers in sorted_club_kicker_combos
             R3 = typeof(rank_trips)
@@ -196,13 +173,7 @@ let k = 1
     combos = collect(combinations(half_deck, 4))
     combos = sort.(combos; by = x->high_value(x), rev=true)
     two_pair_combos = filter(x->high_value(x[1])==high_value(x[2]) && high_value(x[3])==high_value(x[4]), combos)
-    sorted_two_pair_combos = sort(two_pair_combos;
-        by=x->begin
-            vals = high_value.(x)
-            sum(vals[1]*100+vals[3])
-        end,
-        rev=true
-    )
+    sorted_two_pair_combos = sort_combinations(two_pair_combos)
     for rank_2_pair in sorted_two_pair_combos
         for kickers in sort(collect(ranks()); by=x->high_value(x), rev=true)
             R1 = typeof(rank(rank_2_pair[1]))
@@ -226,14 +197,7 @@ let k = 1
     three_quarters_deck = filter(x->suit(x) isa Club, full_deck())
     combos = collect(combinations(three_quarters_deck, 3))
     combos = sort.(combos; by = x->high_value(x), rev=true)
-    combos = sort(combos;
-        by=x->begin
-            vals = high_value.(x)
-            sum(vals[1]*1000+vals[2]*100+vals[3])
-        end,
-        rev=true
-    )
-
+    combos = sort_combinations(combos)
     for RP in typeof.(ranks()[end:-1:1])
         for kickers in combos
             R1 = typeof(rank(kickers[1]))
@@ -258,14 +222,7 @@ let k = 1
     club_deck = filter(x->suit(x) isa Club, full_deck())
     combos = collect(combinations(club_deck, 5))
     combos = sort.(combos; by = x->high_value(x), rev=true)
-    combos = sort(combos;
-        by=x->begin
-            vals = high_value.(x)
-            sum(vals[1]*100000+vals[2]*10000+vals[3]*1000+vals[4]*100+vals[5])
-        end,
-        rev=true
-    )
-
+    combos = sort_combinations(combos)
     for kickers in combos
         is_straight(kickers) && continue
         p = prod(prime.(rank.(kickers)))
