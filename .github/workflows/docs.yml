@@ -21,7 +21,6 @@ jobs:
         env:
           JULIA_PROJECT: "@."
         run: |
-          julia --project=@. -e 'using Pkg; Pkg.instantiate()' # TODO: remove after registering
           julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
       - name: Build and deploy
         env:
