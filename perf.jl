@@ -1,7 +1,7 @@
 using PlayingCards
 using Test
 using Combinatorics
-using HoldemHandEvaluator
+using PokerHandEvaluator
 
 function benchmark()
     k = 0
