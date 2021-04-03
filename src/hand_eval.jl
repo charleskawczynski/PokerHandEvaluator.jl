@@ -8,6 +8,17 @@ using LinearAlgebra: dot
 # for which a method, `hand_rank_offsuit` and
 # `hand_rank_flush` are defined. First, we dispatch
 # based on flush/non-flush:
+"""
+    hand_rank(::Tuple{Card,Card,Card,Card,Card})
+
+The hand rank (from 1:7462)
+
+    (A♡,K♡,Q♡,J♡,10♡) -> 1
+    ...
+    (7♡,5♢,4♣,3♠,2♡) -> 7462
+
+to compare poker hands (lower is better).
+"""
 function hand_rank(t::Tuple{
     Card{R1,S1},
     Card{R2,S2},
