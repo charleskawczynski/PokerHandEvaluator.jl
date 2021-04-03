@@ -1,18 +1,18 @@
 using Test
-using HoldemHandEvaluator
+using PokerHandEvaluator
 using PlayingCards
 using BenchmarkTools
-const HHE = HoldemHandEvaluator
+const PHE = PokerHandEvaluator
 
 @testset "Recurse type" begin
-    @test HHE.type_dn(Ace, 1) == King
+    @test PHE.type_dn(Ace, 1) == King
 
-    @test HHE.dn_type(Ace) == King
-    @test HHE.dn_type(King) == Queen
-    @test HHE.dn_type(Queen) == Jack
-    @test HHE.dn_type(Jack) == NumberCard{10}
-    @test HHE.dn_type(NumberCard{3}) == NumberCard{2}
-    @test HHE.dn_type(NumberCard{2}) == Ace
+    @test PHE.dn_type(Ace) == King
+    @test PHE.dn_type(King) == Queen
+    @test PHE.dn_type(Queen) == Jack
+    @test PHE.dn_type(Jack) == NumberCard{10}
+    @test PHE.dn_type(NumberCard{3}) == NumberCard{2}
+    @test PHE.dn_type(NumberCard{2}) == Ace
 end
 
 @testset "Straight flush (Ranks 1:10)" begin
@@ -44,7 +44,7 @@ end
 end
 
 @testset "N-methods" begin
-    N_offsuit = length(methods(HoldemHandEvaluator.hand_rank_offsuit))
-    N_flush = length(methods(HoldemHandEvaluator.hand_rank_flush))
+    N_offsuit = length(methods(PokerHandEvaluator.hand_rank_offsuit))
+    N_flush = length(methods(PokerHandEvaluator.hand_rank_flush))
     @test N_offsuit+N_flush == 7462
 end

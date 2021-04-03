@@ -1,4 +1,4 @@
-module HoldemHandEvaluator
+module PokerHandEvaluator
 
 using PlayingCards
 using Combinatorics

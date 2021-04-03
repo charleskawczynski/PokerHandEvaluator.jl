@@ -1,5 +1,4 @@
-push!(LOAD_PATH, ".")
-using Documenter, HoldemHandEvaluator
+using Documenter, PokerHandEvaluator
 
 format = Documenter.HTML(
     prettyurls = !isempty(get(ENV, "CI", "")),
@@ -7,13 +6,13 @@ format = Documenter.HTML(
 )
 
 makedocs(
-    sitename = "HoldemHandEvaluator.jl",
+    sitename = "PokerHandEvaluator.jl",
     strict = true,
     format = format,
     checkdocs = :exports,
     clean = true,
     doctest = true,
-    modules = [HoldemHandEvaluator],
+    modules = [PokerHandEvaluator],
     pages = Any[
         "Home" => "index.md",
         "API" => "api.md",
@@ -21,7 +20,7 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/charleskawczynski/HoldemHandEvaluator.jl.git",
+    repo = "github.com/charleskawczynski/PokerHandEvaluator.jl.git",
     target = "build",
     push_preview = true,
     devbranch = "main",
