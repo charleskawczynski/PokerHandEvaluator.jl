@@ -41,7 +41,7 @@ deps = ["ArgTools", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 
 [[HoldemHandEvaluator]]
-deps = ["BenchmarkTools", "Combinatorics", "PlayingCards", "Test"]
+deps = ["BenchmarkTools", "Combinatorics", "LinearAlgebra", "PlayingCards", "Test"]
 path = ".."
 uuid = "18ed25b1-892a-4a3b-b8fc-1036dc9a6a89"
 version = "0.1.0"
