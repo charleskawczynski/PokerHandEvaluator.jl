@@ -43,12 +43,26 @@ function _precompile_()
     # avoid running precompile statements when the package isn't precompiling:
     ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
 
-    for i in 1:7462
-        1 ≤ i ≤ 10 &&      Base.precompile(hand_rank_flush   , (Val{i},))
-        11 ≤ i ≤ 322 &&    Base.precompile(hand_rank_offsuit , (Val{i},))
-        323 ≤ i ≤ 1599 &&  Base.precompile(hand_rank_flush   , (Val{i},))
-        1600 ≤ i ≤ 7462 && Base.precompile(hand_rank_offsuit , (Val{i},))
-    end
+    for hand in straight_flush_ranks();   Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in quad_ranks();             Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in full_house_ranks();       Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in flush_ranks();            Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in offsuit_straight_ranks(); Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in trip_ranks();             Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in two_pair_ranks();         Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in pair_ranks();             Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+    for hand in high_card_ranks();        Base.precompile(hand_rank_flush  , (Val{prod(prime.(hand))},)); end
+
+    for hand in straight_flush_ranks();   Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in quad_ranks();             Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in full_house_ranks();       Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in flush_ranks();            Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in offsuit_straight_ranks(); Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in trip_ranks();             Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in two_pair_ranks();         Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in pair_ranks();             Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+    for hand in high_card_ranks();        Base.precompile(hand_rank_offsuit, (Val{prod(prime.(hand))},)); end
+
 end
 _precompile_()
 
