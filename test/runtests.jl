@@ -44,7 +44,21 @@ end
 end
 
 @testset "N-methods" begin
-    N_offsuit = length(methods(PokerHandEvaluator.hand_rank_offsuit))
-    N_flush = length(methods(PokerHandEvaluator.hand_rank_flush))
+    N_offsuit = length(methods(PHE.hand_rank_offsuit))
+    N_flush = length(methods(PHE.hand_rank_flush))
     @test N_offsuit+N_flush == 7462
+end
+
+@testset "N-hands" begin
+    L_1 = length(PHE.straight_flush_ranks())
+    L_2 = length(PHE.quad_ranks())
+    L_3 = length(PHE.full_house_ranks())
+    L_4 = length(PHE.flush_ranks())
+    L_5 = length(PHE.offsuit_straight_ranks())
+    L_6 = length(PHE.trip_ranks())
+    L_7 = length(PHE.two_pair_ranks())
+    L_8 = length(PHE.pair_ranks())
+    L_9 = length(PHE.high_card_ranks())
+
+    @test L_1+L_2+L_3+L_4+L_5+L_6+L_7+L_8+L_9 == 7462
 end
