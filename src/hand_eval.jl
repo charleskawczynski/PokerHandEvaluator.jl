@@ -20,22 +20,22 @@ The hand rank (from 1:7462)
 to compare poker hands (lower is better).
 """
 function hand_rank(t::Tuple{
-    Card{R1,S1},
-    Card{R2,S2},
-    Card{R3,S3},
-    Card{R4,S4},
-    Card{R5,S5}}
-) where {R1,R2,R3,R4,R5,S1,S2,S3,S4,S5}
+    Card{S1},
+    Card{S2},
+    Card{S3},
+    Card{S4},
+    Card{S5}}
+) where {S1,S2,S3,S4,S5}
     hand_rank_offsuit(Val(prod(prime.(t))))
 end
 
 function hand_rank(t::Tuple{
-    Card{R1,S},
-    Card{R2,S},
-    Card{R3,S},
-    Card{R4,S},
-    Card{R5,S}}
-) where {R1,R2,R3,R4,R5,S}
+    Card{S},
+    Card{S},
+    Card{S},
+    Card{S},
+    Card{S}}
+) where {S}
     hand_rank_flush(Val(prod(prime.(t))))
 end
 
@@ -54,21 +54,27 @@ end
 ##### Rows 1:10 (Straight flush)
 #####
 
-function straight_flush_ranks()
-    card_ranks = [begin
-        (R, type_dn(R,1), type_dn(R,2), type_dn(R,3), type_dn(R,4))
-    end for (i,R) in enumerate(typeof.(ranks()[end:-1:1])[1:end-3])]
-    return card_ranks
-end
+straight_ranks() =
+    (vcat(10:13, 1:1),9:(9+4),8:(8+4),7:(7+4),6:(6+4),5:(5+4),4:(4+4),3:(3+4),2:(2+4),1:(1+4))
 
-for (i,card_ranks) in enumerate(straight_flush_ranks())
-    p = prod(prime.(card_ranks))
+for (i,cards) in enumerate(straight_ranks())
+    p = prod(prime.(cards))
     @eval hand_rank_flush(::Val{$p}) = $i
 end
 
 #####
 ##### Rows 11:166 (4 of a kind)
 #####
+
+function ranks_old()
+    r = ranks()
+    return [r[2:end]..., r[1]]
+end
+
+function ranks_high_to_low()
+    r = ranks()
+    return [r[1], r[end:-1:2]...]
+end
 
 function quad_ranks()
     quads_combos = collect(combinations(full_deck(), 4))
@@ -79,7 +85,7 @@ function quad_ranks()
     sorted_quads_combos = sort_combinations(sorted_quads_combos)
     card_ranks = [begin
         (rank.(quads)..., kicker)
-    end for quads in sorted_quads_combos for kicker in ranks()[end:-1:1] if rank(quads[1]) ≠ kicker]
+    end for quads in sorted_quads_combos for kicker in ranks_old()[end:-1:1] if rank(quads[1]) ≠ kicker]
     return card_ranks
 end
 
@@ -125,8 +131,8 @@ end
 
 consecutive(tup) = all(ntuple(i->tup[i]+1==tup[i+1], 4))
 function is_straight(cards)
-    ranks = sort(collect(high_value.(rank_type.(cards))))
-    ranks_low = sort(collect(low_value.(rank_type.(cards))))
+    ranks = sort(collect(high_value.(cards)))
+    ranks_low = sort(collect(low_value.(cards)))
     high_straight = consecutive(ranks)
     low_straight = consecutive(ranks_low)
     return low_straight || high_straight
@@ -150,14 +156,7 @@ end
 ##### Rows 1600:1609 (offsuit straight)
 #####
 
-function offsuit_straight_ranks()
-    card_ranks = [begin
-        (R, type_dn(R,1), type_dn(R,2), type_dn(R,3), type_dn(R,4))
-    end for R in typeof.(ranks()[end:-1:1])[1:end-3]]
-    return card_ranks
-end
-
-for (k,card_ranks) in enumerate(offsuit_straight_ranks())
+for (k,card_ranks) in enumerate(straight_ranks())
     p = prod(prime.(card_ranks))
     @eval hand_rank_offsuit(::Val{$p}) = 1600+$k-1
 end
@@ -173,7 +172,7 @@ function trip_ranks()
     sorted_club_kicker_combos = sort_combinations(sorted_club_kicker_combos)
     card_ranks = [begin
         (rank_trips,rank_trips,rank_trips,rank.(kickers)...)
-    end for rank_trips in sort(collect(ranks()); by=x->high_value(x), rev=true) for kickers in sorted_club_kicker_combos
+    end for rank_trips in ranks_high_to_low() for kickers in sorted_club_kicker_combos
         if rank_trips ≠ rank(kickers[1]) && rank_trips ≠ rank(kickers[2])]
     return card_ranks
 end
@@ -195,7 +194,7 @@ function two_pair_ranks()
     sorted_two_pair_combos = sort_combinations(two_pair_combos)
     card_ranks = [begin
         (rank.(two_pair)...,kicker)
-    end for two_pair in sorted_two_pair_combos for kicker in sort(collect(ranks()); by=x->high_value(x), rev=true)
+    end for two_pair in sorted_two_pair_combos for kicker in ranks_high_to_low()
         if rank(two_pair[1]) ≠ kicker && rank(two_pair[3]) ≠ kicker]
     return card_ranks
 end
@@ -216,7 +215,7 @@ function pair_ranks()
     combos = sort_combinations(combos)
     card_ranks = [begin
         (ranks_pair, ranks_pair, rank.(kickers)...)
-    end for ranks_pair in ranks()[end:-1:1] for kickers in combos
+    end for ranks_pair in ranks_high_to_low() for kickers in combos
         if ranks_pair ≠ rank(kickers[1]) && ranks_pair ≠ rank(kickers[2]) && ranks_pair ≠ rank(kickers[3])]
     return card_ranks
 end

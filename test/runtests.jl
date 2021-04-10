@@ -4,17 +4,6 @@ using PlayingCards
 using BenchmarkTools
 const PHE = PokerHandEvaluator
 
-@testset "Recurse type" begin
-    @test PHE.type_dn(Ace, 1) == King
-
-    @test PHE.dn_type(Ace) == King
-    @test PHE.dn_type(King) == Queen
-    @test PHE.dn_type(Queen) == Jack
-    @test PHE.dn_type(Jack) == NumberCard{10}
-    @test PHE.dn_type(NumberCard{3}) == NumberCard{2}
-    @test PHE.dn_type(NumberCard{2}) == Ace
-end
-
 @testset "Straight flush (Ranks 1:10)" begin
     include("test_straight_flush.jl")
 end
@@ -50,11 +39,11 @@ end
 end
 
 @testset "N-hands" begin
-    L_1 = length(PHE.straight_flush_ranks())
+    L_1 = length(PHE.straight_ranks()) # flush
     L_2 = length(PHE.quad_ranks())
     L_3 = length(PHE.full_house_ranks())
     L_4 = length(PHE.flush_ranks())
-    L_5 = length(PHE.offsuit_straight_ranks())
+    L_5 = length(PHE.straight_ranks()) # off-suit
     L_6 = length(PHE.trip_ranks())
     L_7 = length(PHE.two_pair_ranks())
     L_8 = length(PHE.pair_ranks())
