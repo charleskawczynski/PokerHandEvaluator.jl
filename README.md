@@ -48,14 +48,9 @@ PokerHandEvaluator.jl simply loops over the combinations of hands (using [Combin
 ```julia
 julia> using BenchmarkTools, PlayingCards, PokerHandEvaluator, InteractiveUtils
 
-julia> @code_typed hand_rank((A♡, A♣, A♠, 3♡, 2♢))
-CodeInfo(
-1 ─     return 1675
-) => Int64
-
 julia> @btime hand_rank($(A♡, A♣, A♠, 3♡, 2♢))
   0.001 ns (0 allocations: 0 bytes)
 1675
 ```
 
-Doing this is very expensive for the compiler as there are many method definitions-- hence why we precompile all of these methods so that the expense is paid up-front.
+Doing this is a bit expensive for the compiler as there are many method definitions.
