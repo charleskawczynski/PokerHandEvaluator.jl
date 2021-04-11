@@ -1,45 +1,26 @@
-# Based on the enumeration of all 7,462 Five-Card Poker Hand Equivalence Classes
+module HandCombinations
 
 using LinearAlgebra: dot
+using PlayingCards
+using Combinatorics
 
-# The product of 5 primes will be unique, and
-# do not depend on the order, so we're using
-# this to map card combinations to a single number
-# for which a method, `hand_rank_offsuit` and
-# `hand_rank_flush` are defined. First, we dispatch
-# based on flush/non-flush:
-"""
-    hand_rank(::Tuple{Card,Card,Card,Card,Card})
+export prime,
+    straight_ranks,
+    quad_ranks,
+    full_house_ranks,
+    is_straight,
+    flush_ranks,
+    trip_ranks,
+    two_pair_ranks,
+    pair_ranks,
+    high_card_ranks
 
-The hand rank (from 1:7462)
+##### Helpers
 
-    (A♡,K♡,Q♡,J♡,10♡) -> 1
-    ...
-    (7♡,5♢,4♣,3♠,2♡) -> 7462
-
-to compare poker hands (lower is better).
-"""
-function hand_rank(t::Tuple{
-    Card{S1},
-    Card{S2},
-    Card{S3},
-    Card{S4},
-    Card{S5}}
-) where {S1,S2,S3,S4,S5}
-    hand_rank_offsuit(Val(prod(prime.(t))))
-end
-
-function hand_rank(t::Tuple{
-    Card{S},
-    Card{S},
-    Card{S},
-    Card{S},
-    Card{S}}
-) where {S}
-    hand_rank_flush(Val(prod(prime.(t))))
-end
-
-hand_rank(v::Vector) = hand_rank(Tuple(v))
+const primes = (41,2,3,5,7,11,13,17,19,23,29,31,37)
+prime(i::UInt8) = primes[i]
+prime(i::Int) = prime(UInt8(i))
+prime(card::Card) = primes[rank(card)]
 
 function sort_combinations(comb, sort_by_first_val = false)
     if length(comb[1])==1 || sort_by_first_val
@@ -50,21 +31,13 @@ function sort_combinations(comb, sort_by_first_val = false)
     end
 end
 
-#####
-##### Rows 1:10 (Straight flush)
-#####
+##### Rows 1:10 (Straight flush) | Rows 1600:1609 (Off-suit straight)
 
-straight_ranks() =
+function straight_ranks()
     (vcat(10:13, 1:1),9:(9+4),8:(8+4),7:(7+4),6:(6+4),5:(5+4),4:(4+4),3:(3+4),2:(2+4),1:(1+4))
-
-for (i,cards) in enumerate(straight_ranks())
-    p = prod(prime.(cards))
-    @eval hand_rank_flush(::Val{$p}) = $i
 end
 
-#####
 ##### Rows 11:166 (4 of a kind)
-#####
 
 function ranks_old()
     r = ranks()
@@ -89,14 +62,7 @@ function quad_ranks()
     return card_ranks
 end
 
-for (k,card_ranks) in enumerate(quad_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 11+$k-1
-end
-
-#####
 ##### Rows 167:322 (full house)
-#####
 
 function full_house_ranks()
     three_quarter_deck = filter(x->suit(x) isa Club || suit(x) isa Heart || suit(x) isa Spade, full_deck())
@@ -120,14 +86,7 @@ function full_house_ranks()
     return card_ranks
 end
 
-for (k,card_ranks) in enumerate(full_house_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 167+$k-1
-end
-
-#####
 ##### Rows 323:1599 (flush)
-#####
 
 consecutive(tup) = all(ntuple(i->tup[i]+1==tup[i+1], 4))
 function is_straight(cards)
@@ -147,23 +106,7 @@ function flush_ranks()
     end for cards in sorted_club_combos if !is_straight(cards)]
 end
 
-for (k,card_ranks) in enumerate(flush_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_flush(::Val{$p}) = 323+$k-1
-end
-
-#####
-##### Rows 1600:1609 (offsuit straight)
-#####
-
-for (k,card_ranks) in enumerate(straight_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 1600+$k-1
-end
-
-#####
 ##### Rows 1610:2467 (trips)
-#####
 
 function trip_ranks()
     club_deck = filter(x->suit(x) isa Club, full_deck())
@@ -177,14 +120,7 @@ function trip_ranks()
     return card_ranks
 end
 
-for (k,card_ranks) in enumerate(trip_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 1610+$k-1
-end
-
-#####
 ##### Rows 2468:3325 (two pair)
-#####
 
 function two_pair_ranks()
     half_deck = filter(x->suit(x) isa Club || suit(x) isa Heart, full_deck())
@@ -199,14 +135,7 @@ function two_pair_ranks()
     return card_ranks
 end
 
-for (k,card_ranks) in enumerate(two_pair_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 2468+$k-1
-end
-
-#####
 ##### Rows 3326:6185 (pair)
-#####
 
 function pair_ranks()
     three_quarters_deck = filter(x->suit(x) isa Club, full_deck())
@@ -220,14 +149,7 @@ function pair_ranks()
     return card_ranks
 end
 
-for (k,card_ranks) in enumerate(pair_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 3326+$k-1
-end
-
-#####
 ##### Rows 6186:7462 (high card)
-#####
 
 function high_card_ranks()
     club_deck = filter(x->suit(x) isa Club, full_deck())
@@ -238,7 +160,4 @@ function high_card_ranks()
     return card_ranks
 end
 
-for (k,card_ranks) in enumerate(high_card_ranks())
-    p = prod(prime.(card_ranks))
-    @eval hand_rank_offsuit(::Val{$p}) = 6186+$k-1
-end
+end # module

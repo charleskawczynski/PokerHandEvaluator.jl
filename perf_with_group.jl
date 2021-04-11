@@ -2,12 +2,13 @@ using PlayingCards
 using Test
 using Combinatorics
 using PokerHandEvaluator
+using PokerHandEvaluator.HandRankAndGroup
 
 function benchmark(N)
     k = 0
     # length(combinations(full_deck(), 5)) = 2598960
     for cards in combinations(full_deck(), 5)
-        hr = hand_rank(cards)
+        hr = hand_rank_and_group(cards)
         k+=1
         k>=N && break
     end
