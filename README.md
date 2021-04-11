@@ -53,4 +53,15 @@ julia> @btime hand_rank($(A♡, A♣, A♠, 3♡, 2♢))
 1675
 ```
 
-Doing this is a bit expensive for the compiler as there are many method definitions.
+Doing this is a bit expensive for the compiler as there are many method definitions. This timing may not be representative of what users should expect, however, running PokerHandEvaluator.jl's `perf.jl` file shows that performance is around 2 μs:
+
+```julia
+julia> include("perf.jl")
+[ Info: Precompiling PokerHandEvaluator [18ed25b1-892a-4a3b-b8fc-1036dc9a6a89]
+Δt_per_hand_eval = 1.3032391999999999e-5
+
+julia> include("perf.jl")
+Δt_per_hand_eval = 1.6626089999999998e-6
+```
+
+This file is configured to evaluate roughly 4% of all possible hands, but can easily be adjusted.
