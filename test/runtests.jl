@@ -32,6 +32,9 @@ end
     include("test_high_card.jl")
 end
 
+@testset "hand_rank(v::Vector)" begin
+    @test hand_rank((A♠,K♠,Q♠,J♠,T♠)) == hand_rank([A♠,K♠,Q♠,J♠,T♠])
+end
 @testset "N-methods" begin
     N_offsuit = length(methods(PHE.hand_rank_offsuit))
     N_flush = length(methods(PHE.hand_rank_flush))

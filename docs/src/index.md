@@ -33,4 +33,4 @@ using PlayingCards, PokerHandEvaluator
 nothing
 ```
 
-Doing this is very expensive for the compiler as there are many method definitions-- hence why we precompile all of these methods so that the expense is paid up-front.
+Doing this is a bit expensive for the compiler as there are many method definitions.
