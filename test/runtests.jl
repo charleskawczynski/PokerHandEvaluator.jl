@@ -1,8 +1,10 @@
 using Test
 using PokerHandEvaluator
+using PokerHandEvaluator.HandRankAndGroup
 using PlayingCards
 using BenchmarkTools
 const PHE = PokerHandEvaluator
+const HRAC = HandRankAndGroup
 
 @testset "Straight flush (Ranks 1:10)" begin
     include("test_straight_flush.jl")
@@ -32,8 +34,9 @@ end
     include("test_high_card.jl")
 end
 
-@testset "hand_rank(v::Vector)" begin
+@testset "Vector interface" begin
     @test hand_rank((A♠,K♠,Q♠,J♠,T♠)) == hand_rank([A♠,K♠,Q♠,J♠,T♠])
+    @test hand_rank_and_group((A♠,K♠,Q♠,J♠,T♠)) == hand_rank_and_group([A♠,K♠,Q♠,J♠,T♠])
 end
 @testset "N-methods" begin
     N_offsuit = length(methods(PHE.hand_rank_offsuit))
@@ -53,4 +56,16 @@ end
     L_9 = length(PHE.high_card_ranks())
 
     @test L_1+L_2+L_3+L_4+L_5+L_6+L_7+L_8+L_9 == 7462
+end
+
+@testset "HandRankAndGroup" begin
+    @test hand_rank_and_group((A♠,K♠,Q♠,J♠,T♠)) == (1, StraightFlush())
+    @test hand_rank_and_group((A♠,A♣,A♡,A♢,K♣)) == (11, Quads())
+    @test hand_rank_and_group((A♠,A♣,A♡,K♢,K♣)) == (167, FullHouse())
+    @test hand_rank_and_group((A♠,K♠,Q♠,J♠,9♠)) == (323, Flush())
+    @test hand_rank_and_group((A♠,K♠,Q♠,J♠,T♣)) == (1600, Straight())
+    @test hand_rank_and_group((A♠,A♣,A♡,K♢,Q♣)) == (1610, Trips())
+    @test hand_rank_and_group((A♠,A♣,K♡,K♢,Q♣)) == (2468, TwoPair())
+    @test hand_rank_and_group((A♠,A♣,K♡,Q♢,J♣)) == (3326, OnePair())
+    @test hand_rank_and_group((A♠,K♣,Q♡,J♢,9♣)) == (6186, HighCard())
 end

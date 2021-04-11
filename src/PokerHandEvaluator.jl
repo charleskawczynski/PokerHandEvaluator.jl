@@ -1,19 +1,26 @@
 module PokerHandEvaluator
 
+using LinearAlgebra: dot
 using PlayingCards
 using Combinatorics
 
 export hand_rank
 
-#####
-##### Hand eval methods
-#####
+"""
+    hand_rank(::Tuple{Card,Card,Card,Card,Card})
 
-const primes = (41,2,3,5,7,11,13,17,19,23,29,31,37)
-prime(i::UInt8) = primes[i]
-prime(i::Int) = prime(UInt8(i))
-prime(card::Card) = primes[rank(card)]
+The hand rank (from 1:7462)
 
-include("hand_eval.jl")
+    (A♡,K♡,Q♡,J♡,10♡) -> 1
+    ...
+    (7♡,5♢,4♣,3♠,2♡) -> 7462
+
+to compare poker hands (lower is better).
+"""
+function hand_rank end
+
+include("HandCombinations.jl")
+include("hand_rank.jl")
+include("HandRankAndGroup.jl")
 
 end # module
