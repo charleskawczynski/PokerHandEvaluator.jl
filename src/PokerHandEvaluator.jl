@@ -197,4 +197,48 @@ end
 include("HandCombinations.jl")
 include("evaluate5.jl")
 
+function _precompile_()
+    # avoid running precompile statements when the package isn't precompiling:
+    ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
+
+    for hand in straight_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in quad_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in full_house_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in flush_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in straight_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in trip_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in two_pair_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in pair_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+    for hand in high_card_ranks()
+        Base.precompile(evaluate5_flush  , (Val{prod(prime.(hand))},))
+        Base.precompile(evaluate5_offsuit, (Val{prod(prime.(hand))},))
+    end
+
+end
+_precompile_()
+
 end # module
