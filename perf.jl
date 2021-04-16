@@ -3,11 +3,10 @@ using BenchmarkTools
 using Test
 using Combinatorics
 using PokerHandEvaluator
-using PokerHandEvaluator.HandRankAndGroup
 
 time_per_eval = true
 # N_evals = 1
-# N_evals = 1
+# N_evals = 2
 N_evals = 10^5      # ~4%  of all combinations
 # N_evals = 10^6    # ~38% of all combinations
 # N_evals = 2598960 # all combinations
@@ -21,8 +20,8 @@ N_old = N_evals
 ###
 
 function benchmark(hands)
-    hr = hand_rank.(hands)
-    # hr = hand_rank_and_group.(hands)
+    ev = PokerHandEvaluator.evaluate5.(hands)
+    # hr = PokerHandEvaluator.to_tuple.(CompactHandEval.(hands))
     return nothing
 end
 
