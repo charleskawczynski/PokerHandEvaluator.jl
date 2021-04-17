@@ -15,6 +15,8 @@ makedocs(
     modules = [PokerHandEvaluator],
     pages = Any[
         "Home" => "index.md",
+        "Implementation" => "implementation.md",
+        "Performance" => "perf.md",
         "API" => "api.md",
     ],
 )

@@ -4,16 +4,22 @@
 CurrentModule = PokerHandEvaluator
 ```
 
-## Hand rank
+## Internal evaluate methods
 
 ```@docs
-hand_rank
+evaluate5
+evaluate
 ```
 
-## Hand rank and group (experimental)
+## Exported types/methods
 
 ```@docs
-HandRankAndGroup
-HandRankAndGroup.AbstractHand
-HandRankAndGroup.hand_rank_and_group
+HandTypes
+AbstractHandType
+CompactHandEval
+FullHandEval
+hand_type
+hand_rank
+best_cards
+all_cards
 ```
