@@ -79,7 +79,6 @@ struct FullHandEval{HT <: AbstractHandType, AC <: Tuple, TC <: Tuple} <: Abstrac
     FullHandEval(player_cards::Tuple, table_cards::Tuple) =
         FullHandEval((player_cards..., table_cards...))
     FullHandEval(all_cards...) = FullHandEval(all_cards)
-    FullHandEval(all_cards::Vector) = FullHandEval(Tuple(all_cards))
     function FullHandEval(all_cards::Tuple)
         @assert 5 ≤ length(all_cards) ≤ 7
         rank, hand_type, best_cards = evaluate_full(all_cards)
@@ -127,7 +126,6 @@ struct CompactHandEval{HT <: AbstractHandType} <: AbstractHandEvaluation
     CompactHandEval(player_cards::Tuple, table_cards::Tuple) =
         CompactHandEval((player_cards..., table_cards...))
     CompactHandEval(all_cards...) = CompactHandEval(all_cards)
-    CompactHandEval(all_cards::Vector) = CompactHandEval(Tuple(all_cards))
     function CompactHandEval(all_cards::Tuple)
         @assert 5 ≤ length(all_cards) ≤ 7
         rank, hand_type = evaluate_compact(all_cards)
@@ -139,12 +137,61 @@ to_tuple(th::CompactHandEval) = (th.rank, th.hand_type)
 hand_rank(th::CompactHandEval) = th.rank
 hand_type(th::CompactHandEval) = th.hand_type
 
+"""
+    combinations_6_choose_5(tup::Tuple)
+
+Unroll `Combinatorics.combinations` for all 5-card
+combinations given 6 cards.
+"""
+function combinations_6_choose_5(tup::Tuple)
+    @assert length(tup) == 6
+    return (
+         (tup[1], tup[2], tup[3], tup[4], tup[5]),
+         (tup[1], tup[2], tup[3], tup[4], tup[6]),
+         (tup[1], tup[2], tup[3], tup[5], tup[6]),
+         (tup[1], tup[2], tup[4], tup[5], tup[6]),
+         (tup[1], tup[3], tup[4], tup[5], tup[6]),
+         (tup[2], tup[3], tup[4], tup[5], tup[6]),
+    )
+end
+
+"""
+    combinations_7_choose_5(tup::Tuple)
+
+Unroll `Combinatorics.combinations` for all 5-card
+combinations given 7 cards.
+"""
+function combinations_7_choose_5(tup::Tuple)
+    @assert length(tup) == 7
+    return (
+        (tup[1], tup[2], tup[3], tup[4], tup[5]),
+        (tup[1], tup[2], tup[3], tup[4], tup[6]),
+        (tup[1], tup[2], tup[3], tup[4], tup[7]),
+        (tup[1], tup[2], tup[3], tup[5], tup[6]),
+        (tup[1], tup[2], tup[3], tup[5], tup[7]),
+        (tup[1], tup[2], tup[3], tup[6], tup[7]),
+        (tup[1], tup[2], tup[4], tup[5], tup[6]),
+        (tup[1], tup[2], tup[4], tup[5], tup[7]),
+        (tup[1], tup[2], tup[4], tup[6], tup[7]),
+        (tup[1], tup[2], tup[5], tup[6], tup[7]),
+        (tup[1], tup[3], tup[4], tup[5], tup[6]),
+        (tup[1], tup[3], tup[4], tup[5], tup[7]),
+        (tup[1], tup[3], tup[4], tup[6], tup[7]),
+        (tup[1], tup[3], tup[5], tup[6], tup[7]),
+        (tup[1], tup[4], tup[5], tup[6], tup[7]),
+        (tup[2], tup[3], tup[4], tup[5], tup[6]),
+        (tup[2], tup[3], tup[4], tup[5], tup[7]),
+        (tup[2], tup[3], tup[4], tup[6], tup[7]),
+        (tup[2], tup[3], tup[5], tup[6], tup[7]),
+        (tup[2], tup[4], tup[5], tup[6], tup[7]),
+        (tup[3], tup[4], tup[5], tup[6], tup[7]),
+    )
+end
 
 """
     evaluate(cards::Card...)
     evaluate(::Card,::Card,::Card,::Card,::Card[,::Card,::Card])
     evaluate(::Tuple{Card,Card,Card,Card,Card[,Card,Card]})
-    evaluate(::Vector{Card})
 
 Evaluates 5, 6, and 7-card hands using
 [`evaluate5`](@ref). This is done by using
@@ -163,13 +210,17 @@ evaluate_full(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card}) = (evaluate5(t)..., 
 
 # Wrapper for 6 card hands:
 function evaluate_full(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card})
-    hand_ranks = map(cards -> (evaluate5(cards)..., Tuple(cards)), combinations(t, 5))
+    hand_ranks = map(combinations_6_choose_5(t)) do cards
+        (evaluate5(cards)..., cards)
+    end
     i_max = argmin(map(x->x[1][1], hand_ranks))
     return hand_ranks[i_max]
 end
 # Wrapper for 7 card hands:
 function evaluate_full(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card,<:Card})
-    hand_ranks = map(cards -> (evaluate5(cards)..., Tuple(cards)), combinations(t, 5))
+    hand_ranks = map(combinations_7_choose_5(t)) do cards
+        (evaluate5(cards)..., cards)
+    end
     i_max = argmin(map(x->x[1][1], hand_ranks))
     return hand_ranks[i_max]
 end
@@ -183,13 +234,17 @@ evaluate_compact(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card}) = evaluate5(t)
 
 # Wrapper for 6 card hands:
 function evaluate_compact(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card})
-    hand_ranks = map(cards -> evaluate5(cards), combinations(t, 5))
+    hand_ranks = map(combinations_6_choose_5(t)) do cards
+        evaluate5(cards)
+    end
     i_max = argmin(map(x->x[1], hand_ranks))
     return hand_ranks[i_max]
 end
 # Wrapper for 7 card hands:
 function evaluate_compact(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card,<:Card})
-    hand_ranks = map(cards -> evaluate5(cards), combinations(t, 5))
+    hand_ranks = map(combinations_7_choose_5(t)) do cards
+        evaluate5(cards)
+    end
     i_max = argmin(map(x->x[1], hand_ranks))
     return hand_ranks[i_max]
 end

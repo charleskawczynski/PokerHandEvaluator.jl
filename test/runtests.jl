@@ -34,10 +34,6 @@ end
     include("test_high_card.jl")
 end
 
-@testset "Vector interface" begin
-    @test first(evaluate5(A♠,K♠,Q♠,J♠,T♠)) == first(evaluate5([A♠,K♠,Q♠,J♠,T♠]))
-end
-
 @testset "N-methods" begin
     N_offsuit = length(methods(PHE.evaluate5_offsuit))
     N_flush = length(methods(PHE.evaluate5_flush))
@@ -95,20 +91,14 @@ end
     che = CompactHandEval((A♠,2♠), table_cards)
     fhe = FullHandEval((A♠,2♠)..., table_cards...)
     che = CompactHandEval((A♠,2♠)..., table_cards...)
-    fhe = FullHandEval( collect((A♠,2♠, table_cards...)))
-    che = CompactHandEval( collect((A♠,2♠, table_cards...)))
 
     fhe = FullHandEval((A♠,2♠), table_cards[1:end-1])
     che = CompactHandEval((A♠,2♠), table_cards[1:end-1])
     fhe = FullHandEval((A♠,2♠)..., table_cards[1:end-1]...)
     che = CompactHandEval((A♠,2♠)..., table_cards[1:end-1]...)
-    fhe = FullHandEval( collect((A♠,2♠, table_cards[1:end-1]...)))
-    che = CompactHandEval( collect((A♠,2♠, table_cards[1:end-1]...)))
 
     fhe = FullHandEval((A♠,2♠), table_cards[1:end-2])
     che = CompactHandEval((A♠,2♠), table_cards[1:end-2])
     fhe = FullHandEval((A♠,2♠)..., table_cards[1:end-2]...)
     che = CompactHandEval((A♠,2♠)..., table_cards[1:end-2]...)
-    fhe = FullHandEval( collect((A♠,2♠, table_cards[1:end-2]...)))
-    che = CompactHandEval( collect((A♠,2♠, table_cards[1:end-2]...)))
 end

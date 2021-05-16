@@ -14,8 +14,8 @@ N_evals = 10^5      # ~4%  of all combinations
 ### Only collect hands if N_evals has changed:
 (@isdefined N_old) || (N_old = N_evals)
 # length(combinations(full_deck(), 5)) = 2598960
-N_old == N_evals || (hands = collect(combinations(full_deck(), 5))[1:N_evals])
-(@isdefined hands) || (hands = collect(combinations(full_deck(), 5))[1:N_evals])
+N_old == N_evals || (hands = Tuple.(collect(combinations(full_deck(), 5))[1:N_evals]))
+(@isdefined hands) || (hands = Tuple.(collect(combinations(full_deck(), 5))[1:N_evals]))
 N_old = N_evals
 ###
 

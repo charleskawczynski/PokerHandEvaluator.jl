@@ -6,7 +6,6 @@ using .HandCombinations
     evaluate5(cards::Card...)
     evaluate5(::Card,::Card,::Card,::Card,::Card)
     evaluate5(::Tuple{Card,Card,Card,Card,Card})
-    evaluate5(::Vector{Card})
 
 This is PokerHandEvaluator.jl's _core_ method.
 
@@ -24,7 +23,6 @@ for 5-card hands _only_.
 function evaluate5 end
 
 evaluate5(cards::Card...) = evaluate5(cards)
-evaluate5(v::Vector) = evaluate5(Tuple(v))
 # The product of 5 primes will be unique, and
 # do not depend on the order, so we're using
 # this to map card combinations to a single number
