@@ -118,6 +118,11 @@ end
     @test_throws AssertionError PHE.hand_type_binary_search(7463)
 end
 
+using StatsBase: sample
+const fd = full_deck()
+sample_cards(N::Int) = sample_cards(Val(N))
+sample_cards(::Val{N}) where {N} = @view fd[sample(1:52, N; replace=false)]
+
 if VERSION >= v"1.4"
     @testset "Allocations" begin
         cards_5 = (J♡,J♣,A♣,A♢,5♣);
@@ -146,4 +151,35 @@ if VERSION >= v"1.4"
         @test alloc_5 ≤ 1440
         @test alloc_6 ≤ 1632
     end
+
+    @testset "CompactHandEval & FullHandEval (5/6/7-card with view)" begin
+        sample_cards_5 = sample_cards(5)
+        sample_cards_6 = sample_cards(6)
+        sample_cards_7 = sample_cards(7)
+
+        # Compile first:
+        alloc_1 = @allocated CompactHandEval(sample_cards_5)
+        alloc_2 = @allocated CompactHandEval(sample_cards_6)
+        alloc_3 = @allocated CompactHandEval(sample_cards_7)
+        alloc_4 = @allocated FullHandEval(sample_cards_5)
+        alloc_5 = @allocated FullHandEval(sample_cards_6)
+        alloc_6 = @allocated FullHandEval(sample_cards_7)
+
+        alloc_1 = @allocated CompactHandEval(sample_cards_5)
+        alloc_2 = @allocated CompactHandEval(sample_cards_6)
+        alloc_3 = @allocated CompactHandEval(sample_cards_7)
+        alloc_4 = @allocated FullHandEval(sample_cards_5)
+        alloc_5 = @allocated FullHandEval(sample_cards_6)
+        alloc_6 = @allocated FullHandEval(sample_cards_7)
+        @test alloc_1 == 176
+        @test alloc_2 == 320
+        @test alloc_3 == 1312
+        @test alloc_4 == 800
+        @test alloc_5 == 864
+        @test alloc_6 == 2032
+
+        @test_throws AssertionError CompactHandEval(@view fd[sample(1:52, 8; replace=false)])
+        @test_throws AssertionError FullHandEval(@view fd[sample(1:52, 8; replace=false)])
+    end
+
 end

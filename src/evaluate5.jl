@@ -20,6 +20,8 @@ for 5-card hands _only_.
 function evaluate5 end
 
 evaluate5(cards::Card...)::Int = evaluate5(cards)
+evaluate5(cards::SubArray)::Int = evaluate5(Tuple(cards))
+
 # The product of 5 primes will be unique, and
 # do not depend on the order, so we're using
 # this to map card combinations to a single number

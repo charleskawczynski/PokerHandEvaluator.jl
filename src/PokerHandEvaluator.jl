@@ -77,7 +77,10 @@ winning_cards = best_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 5♣)
 allcards = all_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 2♣, 3♢, 5♣)
 ```
 """
-struct FullHandEval{AC <: Tuple, TC <: Tuple} <: AbstractHandEvaluation
+struct FullHandEval{
+        AC <: Union{Tuple, SubArray},
+        TC <: Union{Tuple, SubArray}
+    } <: AbstractHandEvaluation
     hand_type::Symbol
     rank::Int
     all_cards::AC
@@ -85,7 +88,7 @@ struct FullHandEval{AC <: Tuple, TC <: Tuple} <: AbstractHandEvaluation
     FullHandEval(player_cards::Tuple, table_cards::Tuple) =
         FullHandEval((player_cards..., table_cards...))
     FullHandEval(all_cards...) = FullHandEval(all_cards)
-    function FullHandEval(all_cards::Tuple)
+    function FullHandEval(all_cards::Union{Tuple,SubArray})
         @assert 5 ≤ length(all_cards) ≤ 7
         rank, hand_type, best_cards = evaluate_full(all_cards)
 
@@ -128,7 +131,7 @@ struct CompactHandEval <: AbstractHandEvaluation
     CompactHandEval(player_cards::Tuple, table_cards::Tuple) =
         CompactHandEval((player_cards..., table_cards...))
     CompactHandEval(all_cards...) = CompactHandEval(all_cards)
-    function CompactHandEval(all_cards::Tuple)
+    function CompactHandEval(all_cards::Union{Tuple,SubArray})
         @assert 5 ≤ length(all_cards) ≤ 7
         return new(evaluate_compact(all_cards))
     end
@@ -191,6 +194,20 @@ function evaluate_full(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card,<:Card
     return best_hand_rank_from_7_cards_full(t)
 end
 
+# Wrapper for view interface:
+function evaluate_full(all_cards::SubArray)
+    n_cards = length(all_cards)
+    if n_cards == 5
+        hand_rank = evaluate5(all_cards)
+        hand_type = hand_type_binary_search(hand_rank)
+        return (hand_rank, hand_type, all_cards)
+    elseif n_cards == 6
+        return best_hand_rank_from_6_cards_full(all_cards)
+    elseif n_cards == 7
+        return best_hand_rank_from_7_cards_full(all_cards)
+    end
+end
+
 #####
 ##### evaluate_compact
 #####
@@ -205,6 +222,17 @@ end
 # Wrapper for 7 card hands:
 function evaluate_compact(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card,<:Card})
     return best_hand_rank_from_7_cards_compact(t)
+end
+# Wrapper for view interface:
+function evaluate_compact(all_cards::SubArray)
+    n_cards = length(all_cards)
+    if n_cards == 5
+        return evaluate5(all_cards)
+    elseif n_cards == 6
+        return best_hand_rank_from_6_cards_compact(all_cards)
+    elseif n_cards == 7
+        return best_hand_rank_from_7_cards_compact(all_cards)
+    end
 end
 
 include("best_hand_rank_from_n_cards.jl")
