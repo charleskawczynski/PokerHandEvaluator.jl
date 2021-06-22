@@ -21,7 +21,6 @@ N_old = N_evals
 
 function benchmark(hands)
     ev = PokerHandEvaluator.evaluate5.(hands)
-    # hr = PokerHandEvaluator.to_tuple.(CompactHandEval.(hands))
     return nothing
 end
 

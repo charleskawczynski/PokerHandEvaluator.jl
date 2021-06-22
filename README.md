@@ -56,7 +56,7 @@ player_cards = (
 );
 fhe = FullHandEval.(player_cards);
 winner_id = argmin(hand_rank.(fhe)) # = 2
-winning_hand = hand_type(fhe[winner_id]) # = Trips()
+winning_hand = hand_type(fhe[winner_id]) # = :trips
 winning_rank = hand_rank(fhe[winner_id]) # = 1842
 winning_cards = best_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 5♣)
 allcards = all_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 2♣, 3♢, 5♣)

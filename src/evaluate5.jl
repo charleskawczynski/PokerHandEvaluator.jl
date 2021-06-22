@@ -9,20 +9,17 @@ using .HandCombinations
 
 This is PokerHandEvaluator.jl's _core_ method.
 
-Returns a tuple with
- - `rank` the rank (from 1:7462):
+Returns the `rank` (an `Int`) from `1:7462`:
 
     (A♡,K♡,Q♡,J♡,10♡) -> 1
     ...
     (7♡,5♢,4♣,3♠,2♡) -> 7462
 
- - `hand` the top hand type ([`AbstractHandType`](@ref))
-
 for 5-card hands _only_.
 """
 function evaluate5 end
 
-evaluate5(cards::Card...) = evaluate5(cards)
+evaluate5(cards::Card...)::Int = evaluate5(cards)
 # The product of 5 primes will be unique, and
 # do not depend on the order, so we're using
 # this to map card combinations to a single number
@@ -37,45 +34,45 @@ evaluate5(t::Tuple{Card{S},Card{S},Card{S},Card{S},Card{S}}) where {S} =
 
 for (i,card_ranks) in enumerate(straight_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_flush(::Val{$p}) = ($i, StraightFlush())          # Rows 1:10 (Straight flush)
+    @eval evaluate5_flush(::Val{$p})::Int = $i          # Rows 1:10 (Straight flush)
 end
 
 for (k,card_ranks) in enumerate(quad_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (11+$k-1, Quads())   # Rows 11:166 (4 of a kind)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 11+$k-1   # Rows 11:166 (4 of a kind)
 end
 
 for (k,card_ranks) in enumerate(full_house_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (167+$k-1, FullHouse())  # Rows 167:322 (full house)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 167+$k-1  # Rows 167:322 (full house)
 end
 
 for (k,card_ranks) in enumerate(flush_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_flush(::Val{$p}) = (323+$k-1, Flush())    # Rows 323:1599 (flush)
+    @eval evaluate5_flush(::Val{$p})::Int = 323+$k-1    # Rows 323:1599 (flush)
 end
 
 for (k,card_ranks) in enumerate(straight_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (1600+$k-1, Straight()) # Rows 1600:1609 (off-suit straight)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 1600+$k-1 # Rows 1600:1609 (off-suit straight)
 end
 
 for (k,card_ranks) in enumerate(trip_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (1610+$k-1, Trips()) # Rows 1610:2467 (trips)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 1610+$k-1 # Rows 1610:2467 (trips)
 end
 
 for (k,card_ranks) in enumerate(two_pair_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (2468+$k-1, TwoPair()) # Rows 2468:3325 (two pair)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 2468+$k-1 # Rows 2468:3325 (two pair)
 end
 
 for (k,card_ranks) in enumerate(pair_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (3326+$k-1, OnePair()) # Rows 3326:6185 (pair)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 3326+$k-1 # Rows 3326:6185 (pair)
 end
 
 for (k,card_ranks) in enumerate(high_card_ranks())
     p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p}) = (6186+$k-1, HighCard()) # Rows 6186:7462 (high card)
+    @eval evaluate5_offsuit(::Val{$p})::Int = 6186+$k-1 # Rows 6186:7462 (high card)
 end

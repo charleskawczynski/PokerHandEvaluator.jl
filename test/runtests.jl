@@ -1,7 +1,6 @@
 using Test
 using PokerHandEvaluator
 using PokerHandEvaluator: evaluate5
-using PokerHandEvaluator.HandTypes
 using PlayingCards
 using BenchmarkTools
 const PHE = PokerHandEvaluator
@@ -63,7 +62,7 @@ end
     che = CompactHandEval.(player_cards)
     winner = che[argmin(hand_rank.(che))]
     @test hand_rank(winner) == 47
-    @test hand_type(winner) == Quads()
+    @test hand_type(winner) == :quads
 
     table_cards = (J♡,J♣,A♣,A♢,5♣)
     player_cards = (
@@ -73,18 +72,10 @@ end
     fhe = FullHandEval.(player_cards)
     winner = fhe[argmin(hand_rank.(fhe))]
     @test hand_rank(winner) == 47
-    @test hand_type(winner) == Quads()
+    @test hand_type(winner) == :quads
     # could have equally returned (J♠,J♣,J♡,J♣,A♢):
     @test best_cards(winner) == (J♠,J♣,J♡,J♣,A♣)
     @test all_cards(winner) == (J♠,J♣,table_cards...)
-
-    @test PokerHandEvaluator.to_tuple(FullHandEval((A♠,2♠), table_cards)) == (
-        169,
-        FullHouse(),
-        (A♠, J♡, J♣, A♣, A♢),
-        (A♠, 2♠, J♡, J♣, A♣, A♢, 5♣)
-    )
-    @test PokerHandEvaluator.to_tuple(CompactHandEval((A♠,2♠), table_cards)) == (169, FullHouse())
 
     # Additional interfaces
     fhe = FullHandEval((A♠,2♠), table_cards)
@@ -101,4 +92,28 @@ end
     che = CompactHandEval((A♠,2♠), table_cards[1:end-2])
     fhe = FullHandEval((A♠,2♠)..., table_cards[1:end-2]...)
     che = CompactHandEval((A♠,2♠)..., table_cards[1:end-2]...)
+end
+
+
+function compute_hand_type_simple(rank::Int)
+         if 1 ≤ rank ≤ 10;     return :straight_flush
+    elseif 11 ≤ rank ≤ 166;    return :quads
+    elseif 167 ≤ rank ≤ 322;   return :full_house
+    elseif 323 ≤ rank ≤ 1599;  return :flush
+    elseif 1600 ≤ rank ≤ 1609; return :straight
+    elseif 1610 ≤ rank ≤ 2467; return :trips
+    elseif 2468 ≤ rank ≤ 3325; return :two_pair
+    elseif 3326 ≤ rank ≤ 6185; return :one_pair
+    elseif 6186 ≤ rank ≤ 7462; return :high_card
+    else; error("Bad hand rank input")
+    end
+end
+
+@testset "Hand types" begin
+    ranks = 1:7462
+    hrts = compute_hand_type_simple.(ranks)
+    hrtbs = PHE.hand_type_binary_search.(ranks)
+    @test all(hrts .== hrtbs)
+    @test_throws AssertionError PHE.hand_type_binary_search(0)
+    @test_throws AssertionError PHE.hand_type_binary_search(7463)
 end

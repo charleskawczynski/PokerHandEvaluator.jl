@@ -13,7 +13,7 @@ There are `combinations(52,5)`, or 2,598,960, unique 5-card hands. However, many
  - ...
  - 7 5 4 3 2: `rank = 7462`
 
-PokerHandEvaluator.jl's core method, [`evaluate5`](@ref), returns this rank (and the [`AbstractHandType`](@ref)) so that any two hands can be compared to determine the winner. There's one more wrinkle to flatten. Exposing an interface that is order-agnostic (so that users don't need to sort the cards before evaluation) is important for performance. To make the `evaluate5` order-agnostic, the card rank of each input is mapped to prime numbers:
+PokerHandEvaluator.jl's core method, [`evaluate5`](@ref), returns this rank so that any two hands can be compared to determine the winner. There's one more wrinkle to flatten. Exposing an interface that is order-agnostic (so that users don't need to sort the cards before evaluation) is important for performance. To make the `evaluate5` order-agnostic, the card rank of each input is mapped to prime numbers:
 
 ```julia
 const primes = (41,2,3,5,7,11,13,17,19,23,29,31,37)

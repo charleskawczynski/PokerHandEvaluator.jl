@@ -14,8 +14,6 @@ evaluate
 ## Exported types/methods
 
 ```@docs
-HandTypes
-AbstractHandType
 CompactHandEval
 FullHandEval
 hand_type
