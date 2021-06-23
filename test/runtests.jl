@@ -117,3 +117,33 @@ end
     @test_throws AssertionError PHE.hand_type_binary_search(0)
     @test_throws AssertionError PHE.hand_type_binary_search(7463)
 end
+
+if VERSION >= v"1.4"
+    @testset "Allocations" begin
+        cards_5 = (J♡,J♣,A♣,A♢,5♣);
+        cards_7 = (A♠,2♠,cards_5...);
+        cards_6 = (J♣,cards_5...);
+
+        # Compile first:
+        alloc_1 = @allocated CompactHandEval(cards_5)
+        alloc_2 = @allocated CompactHandEval(cards_6)
+        alloc_3 = @allocated CompactHandEval(cards_7)
+        alloc_4 = @allocated FullHandEval(cards_5)
+        alloc_5 = @allocated FullHandEval(cards_6)
+        alloc_6 = @allocated FullHandEval(cards_7)
+
+        alloc_1 = @allocated CompactHandEval(cards_5)
+        alloc_2 = @allocated CompactHandEval(cards_6)
+        alloc_3 = @allocated CompactHandEval(cards_7)
+        alloc_4 = @allocated FullHandEval(cards_5)
+        alloc_5 = @allocated FullHandEval(cards_6)
+        alloc_6 = @allocated FullHandEval(cards_7)
+
+        @test alloc_1 ≤ 32
+        @test alloc_2 ≤ 688
+        @test alloc_3 ≤ 944
+        @test alloc_4 ≤ 144
+        @test alloc_5 ≤ 1440
+        @test alloc_6 ≤ 1632
+    end
+end
