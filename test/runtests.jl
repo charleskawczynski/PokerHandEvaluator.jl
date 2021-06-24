@@ -144,12 +144,19 @@ if VERSION >= v"1.4"
         alloc_5 = @allocated FullHandEval(cards_6)
         alloc_6 = @allocated FullHandEval(cards_7)
 
-        @test alloc_1 ≤ 32
-        @test alloc_2 ≤ 688
-        @test alloc_3 ≤ 944
-        @test alloc_4 ≤ 144
-        @test alloc_5 ≤ 1440
-        @test alloc_6 ≤ 1632
+        @show alloc_1
+        @show alloc_2
+        @show alloc_3
+        @show alloc_4
+        @show alloc_5
+        @show alloc_6
+
+        @test alloc_1 == 32
+        @test alloc_2 == 688
+        @test alloc_3 == 944
+        @test alloc_4 == 144
+        @test alloc_5 == 1440
+        @test alloc_6 == 1632
     end
 
     @testset "CompactHandEval & FullHandEval (5/6/7-card with view)" begin

@@ -78,8 +78,8 @@ allcards = all_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 2♣, 3♢, 5�
 ```
 """
 struct FullHandEval{
-        AC <: Union{Tuple, SubArray},
-        TC <: Union{Tuple, SubArray}
+        AC <: Union{Tuple, AbstractArray},
+        TC <: Union{Tuple, AbstractArray}
     } <: AbstractHandEvaluation
     hand_type::Symbol
     rank::Int
@@ -88,7 +88,7 @@ struct FullHandEval{
     FullHandEval(player_cards::Tuple, table_cards::Tuple) =
         FullHandEval((player_cards..., table_cards...))
     FullHandEval(all_cards...) = FullHandEval(all_cards)
-    function FullHandEval(all_cards::Union{Tuple,SubArray})
+    function FullHandEval(all_cards::Union{Tuple,AbstractArray})
         @assert 5 ≤ length(all_cards) ≤ 7
         rank, hand_type, best_cards = evaluate_full(all_cards)
 
@@ -130,8 +130,8 @@ struct CompactHandEval <: AbstractHandEvaluation
     rank::Int
     CompactHandEval(player_cards::Tuple, table_cards::Tuple) =
         CompactHandEval((player_cards..., table_cards...))
-    CompactHandEval(all_cards...) = CompactHandEval(all_cards)
-    function CompactHandEval(all_cards::Union{Tuple,SubArray})
+    # CompactHandEval(all_cards...) = CompactHandEval(all_cards)
+    function CompactHandEval(all_cards::Union{Tuple,AbstractArray})
         @assert 5 ≤ length(all_cards) ≤ 7
         return new(evaluate_compact(all_cards))
     end
@@ -195,7 +195,7 @@ function evaluate_full(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card,<:Card
 end
 
 # Wrapper for view interface:
-function evaluate_full(all_cards::SubArray)
+function evaluate_full(all_cards::AbstractArray)
     n_cards = length(all_cards)
     if n_cards == 5
         hand_rank = evaluate5(all_cards)
@@ -224,7 +224,7 @@ function evaluate_compact(t::Tuple{<:Card,<:Card,<:Card,<:Card,<:Card,<:Card,<:C
     return best_hand_rank_from_7_cards_compact(t)
 end
 # Wrapper for view interface:
-function evaluate_compact(all_cards::SubArray)
+function evaluate_compact(all_cards::AbstractArray)
     n_cards = length(all_cards)
     if n_cards == 5
         return evaluate5(all_cards)
