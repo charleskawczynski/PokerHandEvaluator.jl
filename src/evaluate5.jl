@@ -26,11 +26,14 @@ evaluate5(cards::Card...)::Int = evaluate5(cards)
 # for which a method, `evaluate_offsuit` and
 # `evaluate_flush` are defined. First, we dispatch
 # based on flush/non-flush:
-evaluate5(t::Tuple{Card{S1},Card{S2},Card{S3},Card{S4},Card{S5}}) where {S1,S2,S3,S4,S5} =
-    evaluate5_offsuit(Val(prod(prime.(t))))
-
-evaluate5(t::Tuple{Card{S},Card{S},Card{S},Card{S},Card{S}}) where {S} =
-    evaluate5_flush(Val(prod(prime.(t))))
+function evaluate5(t::NTuple{N,Card}) where {N}
+    @assert N == 5
+    if suit(t[1]) == suit(t[2]) == suit(t[3]) == suit(t[4]) == suit(t[5])
+        evaluate5_flush(Val(prod(prime.(t))))
+    else
+        evaluate5_offsuit(Val(prod(prime.(t))))
+    end
+end
 
 for (i,card_ranks) in enumerate(straight_ranks())
     p = prod(prime.(card_ranks))

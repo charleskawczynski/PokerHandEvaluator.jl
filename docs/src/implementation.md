@@ -22,14 +22,16 @@ prime(card::Card) = primes[rank(card)]
 
 The product of prime numbers are (1) unique and (2) order-agnostic (due to the multiplication commutative property). This mapped relationship can be implemented in various ways, for example via lookup tables, binary search etc.. PokerHandEvaluator.jl simply loops over the combinations of hands (using [Combinatorics.jl](https://github.com/JuliaMath/Combinatorics.jl)) and `eval`s the methods (by dispatching on types `::Val{prod(primes.(cards))}`) to return the rank directly.
 
-Finally, PokerHandEvaluator.jl specializes on [PlayingCards.jl](https://github.com/charleskawczynski/PlayingCards.jl)'s `suit` type parameter to disambiguate flush vs off-suited hands:
+Finally, PokerHandEvaluator.jl checks to see the card's `suit` to disambiguate flush vs off-suited hands:
 
 ```julia
-evaluate5(t::Tuple{Card{S1},Card{S2},Card{S3},Card{S4},Card{S5}}) where {S1,S2,S3,S4,S5} =
-    evaluate5_offsuit(Val(prod(prime.(t))))
-
-evaluate5(t::Tuple{Card{S},Card{S},Card{S},Card{S},Card{S}}) where {S} =
-    evaluate5_flush(Val(prod(prime.(t))))
+function evaluate5(t::NTuple{N,Card}) where {N}
+    if suit(t[1]) == suit(t[2]) == suit(t[3]) == suit(t[4]) == suit(t[5])
+        evaluate5_flush(Val(prod(prime.(t))))
+    else
+        evaluate5_offsuit(Val(prod(prime.(t))))
+    end
+end
 ```
 
 This approach has performance / compile-time implications. See the [performance](./perf.md) documentation for more information.
