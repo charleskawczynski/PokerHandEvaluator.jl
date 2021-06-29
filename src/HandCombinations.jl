@@ -18,8 +18,8 @@ export prime,
 ##### Helpers
 
 const primes = (41,2,3,5,7,11,13,17,19,23,29,31,37)
-prime(i::UInt8) = primes[i]
-prime(i::Int) = prime(UInt8(i))
+prime(i::Int8) = primes[i]
+prime(i::Int) = prime(Int8(i))
 prime(card::Card) = primes[rank(card)]
 
 function sort_combinations(comb, sort_by_first_val = false)
@@ -65,8 +65,8 @@ end
 ##### Rows 167:322 (full house)
 
 function full_house_ranks()
-    three_quarter_deck = filter(x->suit(x) isa Club || suit(x) isa Heart || suit(x) isa Spade, full_deck())
-    half_deck = filter(x->suit(x) isa Club || suit(x) isa Heart, full_deck())
+    three_quarter_deck = filter(x->suit(x) == ♣ || suit(x) == ♡ || suit(x) == ♠, full_deck())
+    half_deck = filter(x->suit(x) == ♣ || suit(x) == ♡, full_deck())
     trip_combos = collect(combinations(three_quarter_deck, 3))
     pair_combos = collect(combinations(half_deck, 2))
     trip_combos = sort.(trip_combos; by = x->high_value(x), rev=true)
@@ -98,7 +98,7 @@ function is_straight(cards)
 end
 
 function flush_ranks()
-    club_combos = combinations(filter(x->suit(x) isa Club, full_deck()), 5)
+    club_combos = combinations(filter(x->suit(x) == ♣, full_deck()), 5)
     sorted_club_combos = sort.(club_combos; by = x->high_value(x), rev=true)
     sorted_club_combos = sort_combinations(sorted_club_combos)
     card_ranks = [begin
@@ -109,7 +109,7 @@ end
 ##### Rows 1610:2467 (trips)
 
 function trip_ranks()
-    club_deck = filter(x->suit(x) isa Club, full_deck())
+    club_deck = filter(x->suit(x) == ♣, full_deck())
     club_kicker_combos = collect(combinations(club_deck, 2))
     sorted_club_kicker_combos = sort.(club_kicker_combos; by = x->high_value(x), rev=true)
     sorted_club_kicker_combos = sort_combinations(sorted_club_kicker_combos)
@@ -123,7 +123,7 @@ end
 ##### Rows 2468:3325 (two pair)
 
 function two_pair_ranks()
-    half_deck = filter(x->suit(x) isa Club || suit(x) isa Heart, full_deck())
+    half_deck = filter(x->suit(x) == ♣ || suit(x) == ♡, full_deck())
     combos = collect(combinations(half_deck, 4))
     combos = sort.(combos; by = x->high_value(x), rev=true)
     two_pair_combos = filter(x->high_value(x[1])==high_value(x[2]) && high_value(x[3])==high_value(x[4]), combos)
@@ -138,7 +138,7 @@ end
 ##### Rows 3326:6185 (pair)
 
 function pair_ranks()
-    three_quarters_deck = filter(x->suit(x) isa Club, full_deck())
+    three_quarters_deck = filter(x->suit(x) == ♣, full_deck())
     combos = collect(combinations(three_quarters_deck, 3))
     combos = sort.(combos; by = x->high_value(x), rev=true)
     combos = sort_combinations(combos)
@@ -152,7 +152,7 @@ end
 ##### Rows 6186:7462 (high card)
 
 function high_card_ranks()
-    club_deck = filter(x->suit(x) isa Club, full_deck())
+    club_deck = filter(x->suit(x) == ♣, full_deck())
     combos = collect(combinations(club_deck, 5))
     combos = sort.(combos; by = x->high_value(x), rev=true)
     combos = sort_combinations(combos)
