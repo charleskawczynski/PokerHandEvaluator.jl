@@ -26,7 +26,7 @@ evaluate5(cards::Card...)::Int = evaluate5(cards)
 # for which a method, `evaluate_offsuit` and
 # `evaluate_flush` are defined. First, we dispatch
 # based on flush/non-flush:
-function evaluate5(t::NTuple{N,Card}) where {N}
+function evaluate5(t::NTuple{N,Card})::Int where {N}
     @assert N == 5
     if suit(t[1]) == suit(t[2]) == suit(t[3]) == suit(t[4]) == suit(t[5])
         evaluate5_flush(Val(prod(prime.(t))))
