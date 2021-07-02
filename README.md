@@ -64,14 +64,46 @@ allcards = all_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 2♣, 3♢, 5�
 
 ## Performance
 
+Here's a code snippet to see performance
+
+!!! note
+    this needs some additional packages (StatsBase.jl, BenchmarkTools.jl, and Combinatorics.jl) that are not shipped with PokerHandEvaluator.jl
+
+```julia
+using PokerHandEvaluator
+phe_dir = dirname(dirname(pathof(PokerHandEvaluator)));
+include(joinpath(phe_dir, "perf.jl"))
+```
+
+Running this gives:
+
 ```julia
 julia> using PokerHandEvaluator
 
 julia> phe_dir = dirname(dirname(pathof(PokerHandEvaluator)));
 
-julia> include(joinpath(phe_dir, "perf.jl")) # compile first
-Δt_per_hand_eval = 1.4598465e-5
-
 julia> include(joinpath(phe_dir, "perf.jl"))
-Δt_per_hand_eval = 1.082814e-6
+Δt_per_evaluate5 = 2.0215967156093207e-8
+*******5-card hand evaluation benchmark*******
+BechmarkTools.Trial: 10000 samples with 195 evaluations.
+ Range (min … max):  487.949 ns …   6.095 μs  ┊ GC (min … max): 0.00% … 82.90%
+ Time  (median):     509.082 ns               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   549.924 ns ± 194.761 ns  ┊ GC (mean ± σ):  1.47% ±  4.24%
+
+  ▂▆█▄▂▃▂  ▁▁                                                   ▁
+  ██████████████▇▇▇▇███████▆▇▆▇▇▆▆▅▆▆▆▇▇▆▆▆▆▆▅▆▆▆▅▅▅▅▄▅▄▅▃▅▃▅▃▃ █
+  488 ns        Histogram: log(frequency) by time        110 μs <
+
+ Memory estimate: 608 bytes, allocs estimate: 8.
+*******7-card hand evaluation benchmark*******
+BechmarkTools.Trial: 10000 samples with 15 evaluations.
+ Range (min … max):  932.067 ns …  57.009 μs  ┊ GC (min … max): 0.00% … 97.53%
+ Time  (median):       1.042 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):     1.111 μs ± 633.655 ns  ┊ GC (mean ± σ):  0.50% ±  0.98%
+
+   ▅▇█▇▆▅▄▃▁                         ▁                          ▂
+  ▇█████████▇▆▆▅▅▆▅▃▃▄▁▅▅▃▄▄▁▁▃▁▃▆████▇▇█▇▆▆▅▆▄▅▅▃▄▃▅▅▅▅▅▆▆▅▅▅▅ █
+  932 ns        Histogram: log(frequency) by time       2.69 μs <
+
+ Memory estimate: 640 bytes, allocs estimate: 10.
 ```
