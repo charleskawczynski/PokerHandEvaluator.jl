@@ -34,8 +34,8 @@ end
 end
 
 @testset "N-methods" begin
-    N_offsuit = length(methods(PHE.evaluate5_offsuit))
-    N_flush = length(methods(PHE.evaluate5_flush))
+    N_offsuit = length(PHE.hash_table_offsuit)
+    N_flush = length(PHE.hash_table_suited)
     @test N_offsuit+N_flush == 7462
 end
 

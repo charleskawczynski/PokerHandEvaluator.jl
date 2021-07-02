@@ -29,53 +29,41 @@ evaluate5(cards::Card...)::Int = evaluate5(cards)
 function evaluate5(t::NTuple{N,Card})::Int where {N}
     @assert N == 5
     if suit(t[1]) == suit(t[2]) == suit(t[3]) == suit(t[4]) == suit(t[5])
-        evaluate5_flush(Val(prod(prime.(t))))
+        return hash_table_suited[prod(prime.(t))]
     else
-        evaluate5_offsuit(Val(prod(prime.(t))))
+        return hash_table_offsuit[prod(prime.(t))]
     end
 end
 
-for (i,card_ranks) in enumerate(straight_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_flush(::Val{$p})::Int = $i          # Rows 1:10 (Straight flush)
-end
+const hash_table_suited = Dict{Int,Int}(hcat(
+    map(enumerate(straight_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), i)       # Rows 1:10 (Straight flush)
+    end...,
+    map(enumerate(flush_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 323+i-1) # Rows 323:1599 (flush)
+    end...,
+))
 
-for (k,card_ranks) in enumerate(quad_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 11+$k-1   # Rows 11:166 (4 of a kind)
-end
-
-for (k,card_ranks) in enumerate(full_house_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 167+$k-1  # Rows 167:322 (full house)
-end
-
-for (k,card_ranks) in enumerate(flush_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_flush(::Val{$p})::Int = 323+$k-1    # Rows 323:1599 (flush)
-end
-
-for (k,card_ranks) in enumerate(straight_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 1600+$k-1 # Rows 1600:1609 (off-suit straight)
-end
-
-for (k,card_ranks) in enumerate(trip_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 1610+$k-1 # Rows 1610:2467 (trips)
-end
-
-for (k,card_ranks) in enumerate(two_pair_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 2468+$k-1 # Rows 2468:3325 (two pair)
-end
-
-for (k,card_ranks) in enumerate(pair_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 3326+$k-1 # Rows 3326:6185 (pair)
-end
-
-for (k,card_ranks) in enumerate(high_card_ranks())
-    p = prod(prime.(card_ranks))
-    @eval evaluate5_offsuit(::Val{$p})::Int = 6186+$k-1 # Rows 6186:7462 (high card)
-end
+const hash_table_offsuit = Dict{Int,Int}(hcat(
+    map(enumerate(quad_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 11+i-1)   # Rows 11:166 (4 of a kind)
+    end...,
+    map(enumerate(full_house_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 167+i-1)  # Rows 167:322 (full house)
+    end...,
+    map(enumerate(straight_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 1600+i-1) # Rows 1600:1609 (off-suit straight)
+    end...,
+    map(enumerate(trip_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 1610+i-1) # Rows 1610:2467 (trips)
+    end...,
+    map(enumerate(two_pair_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 2468+i-1) # Rows 2468:3325 (two pair)
+    end...,
+    map(enumerate(pair_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 3326+i-1) # Rows 3326:6185 (pair)
+    end...,
+    map(enumerate(high_card_ranks())) do (i,card_ranks)
+        Pair(prod(prime.(card_ranks)), 6186+i-1) # Rows 6186:7462 (high card)
+    end...,
+))
