@@ -64,10 +64,12 @@ allcards = all_cards(fhe[winner_id]) # = (J♠, T♣, J♡, J♣, 2♣, 3♢, 5�
 
 ## Performance
 
+If you clone PokerHandEvaluator.jl, you can run the performance script, `perf.jl`, at the top-level of the project.
 Here's a code snippet to see performance
 
-!!! note
-    this needs some additional packages (StatsBase.jl, BenchmarkTools.jl, and Combinatorics.jl) that are not shipped with PokerHandEvaluator.jl
+
+> **Note** Running `perf.jl` needs some additional packages (StatsBase.jl, BenchmarkTools.jl, and Combinatorics.jl) that are not shipped with PokerHandEvaluator.jl
+
 
 ```julia
 using PokerHandEvaluator
