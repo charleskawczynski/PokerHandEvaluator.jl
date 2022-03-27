@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Performance · PokerHandEvaluator.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">PokerHandEvaluator.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../implementation/">Implementation</a></li><li class="is-active"><a class="tocitem" href>Performance</a></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Performance</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Performance</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/charleskawczynski/PokerHandEvaluator.jl/blob/master/docs/src/perf.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Performance"><a class="docs-heading-anchor" href="#Performance">Performance</a><a id="Performance-1"></a><a class="docs-heading-anchor-permalink" href="#Performance" title="Permalink"></a></h1><p>There is a <a href="https://github.com/charleskawczynski/PokerHandEvaluator.jl/blob/main/perf.jl"><code>perf.jl</code></a> file at the top level of the repo which roughly estimates PokerHandEvaluator.jl&#39;s performance. Here is a snapshot example of using <a href="https://github.com/JuliaCI/BenchmarkTools.jl"><code>BenchmarkTools</code></a> on PokerHandEvaluator.jl&#39;s base evaluation method <a href="../api/#PokerHandEvaluator.evaluate5"><code>evaluate5</code></a>:</p><pre><code class="language-julia">using BenchmarkTools, InteractiveUtils
+using PlayingCards, PokerHandEvaluator
+@code_typed PokerHandEvaluator.evaluate5((A♡, A♣, A♠, 3♡, 2♢))</code></pre><pre class="documenter-example-output">CodeInfo(
+1 ─── %1   = PokerHandEvaluator.Int::Core.Const(Int64)
+│     %2   = Base.getfield(t, 2, true)::PlayingCards.Card
+│     %3   = Base.getfield(%2, :value)::UInt8
+│     %4   = Base.and_int(0x30, %3)::UInt8
+│     %5   = Base.lshr_int(%4, 0x0000000000000004)::UInt8
+│     %6   = Base.shl_int(%4, 0xfffffffffffffffc)::UInt8
+│     %7   = Base.ifelse(true, %5, %6)::UInt8
+│     %8   = Base.slt_int(0, 0)::Bool
+│     %9   = Base.bitcast(UInt64, 0)::UInt64
+│     %10  = Core.zext_int(Core.UInt64, %7)::UInt64
+│     %11  = Base.ule_int(%9, %10)::Bool
+│     %12  = Base.or_int(%8, %11)::Bool
+└────        goto #3 if not %12
+2 ─── %14  = Base.sle_int(0, 3)::Bool
+│     %15  = Base.bitcast(UInt64, 3)::UInt64
+│     %16  = Core.zext_int(Core.UInt64, %7)::UInt64
+│     %17  = Base.ule_int(%16, %15)::Bool
+│     %18  = Base.and_int(%14, %17)::Bool
+└────        goto #4
+3 ───        nothing::Nothing
+4 ┄── %21  = φ (#2 =&gt; %18, #3 =&gt; false)::Bool
+└────        goto #6 if not %21
+5 ─── %23  = PlayingCards.Suit::Type{PlayingCards.Suit}
+│     %24  = %new(%23, %7)::PlayingCards.Suit
+└────        goto #7
+6 ─── %26  = Base.string(&quot;invalid suit number: &quot;, %7)::Any
+│     %27  = PlayingCards.ArgumentError(%26)::Any
+│            PlayingCards.throw(%27)::Union{}
+└────        unreachable
+7 ───        goto #8
+8 ─── %31  = Base.getfield(t, 1, true)::PlayingCards.Card
+│     %32  = Base.getfield(%31, :value)::UInt8
+│     %33  = Base.and_int(0x30, %32)::UInt8
+│     %34  = Base.lshr_int(%33, 0x0000000000000004)::UInt8
+│     %35  = Base.shl_int(%33, 0xfffffffffffffffc)::UInt8
+│     %36  = Base.ifelse(true, %34, %35)::UInt8
+│     %37  = Base.slt_int(0, 0)::Bool
+│     %38  = Base.bitcast(UInt64, 0)::UInt64
+│     %39  = Core.zext_int(Core.UInt64, %36)::UInt64
+│     %40  = Base.ule_int(%38, %39)::Bool
+│     %41  = Base.or_int(%37, %40)::Bool
+└────        goto #10 if not %41
+9 ─── %43  = Base.sle_int(0, 3)::Bool
+│     %44  = Base.bitcast(UInt64, 3)::UInt64
+│     %45  = Core.zext_int(Core.UInt64, %36)::UInt64
+│     %46  = Base.ule_int(%45, %44)::Bool
+│     %47  = Base.and_int(%43, %46)::Bool
+└────        goto #11
+10 ──        nothing::Nothing
+11 ┄─ %50  = φ (#9 =&gt; %47, #10 =&gt; false)::Bool
+└────        goto #13 if not %50
+12 ── %52  = PlayingCards.Suit::Type{PlayingCards.Suit}
+│     %53  = %new(%52, %36)::PlayingCards.Suit
+└────        goto #14
+13 ── %55  = Base.string(&quot;invalid suit number: &quot;, %36)::Any
+│     %56  = PlayingCards.ArgumentError(%55)::Any
+│            PlayingCards.throw(%56)::Union{}
+└────        unreachable
+14 ──        goto #15
+15 ── %60  = (%53 === %24)::Bool
+└────        goto #44 if not %60
+16 ── %62  = Base.getfield(t, 3, true)::PlayingCards.Card
+│     %63  = Base.getfield(%62, :value)::UInt8
+│     %64  = Base.and_int(0x30, %63)::UInt8
+│     %65  = Base.lshr_int(%64, 0x0000000000000004)::UInt8
+│     %66  = Base.shl_int(%64, 0xfffffffffffffffc)::UInt8
+│     %67  = Base.ifelse(true, %65, %66)::UInt8
+│     %68  = Base.slt_int(0, 0)::Bool
+│     %69  = Base.bitcast(UInt64, 0)::UInt64
+│     %70  = Core.zext_int(Core.UInt64, %67)::UInt64
+│     %71  = Base.ule_int(%69, %70)::Bool
+│     %72  = Base.or_int(%68, %71)::Bool
+└────        goto #18 if not %72
+17 ── %74  = Base.sle_int(0, 3)::Bool
+│     %75  = Base.bitcast(UInt64, 3)::UInt64
+│     %76  = Core.zext_int(Core.UInt64, %67)::UInt64
+│     %77  = Base.ule_int(%76, %75)::Bool
+│     %78  = Base.and_int(%74, %77)::Bool
+└────        goto #19
+18 ──        nothing::Nothing
+19 ┄─ %81  = φ (#17 =&gt; %78, #18 =&gt; false)::Bool
+└────        goto #21 if not %81
+20 ── %83  = PlayingCards.Suit::Type{PlayingCards.Suit}
+│     %84  = %new(%83, %67)::PlayingCards.Suit
+└────        goto #22
+21 ── %86  = Base.string(&quot;invalid suit number: &quot;, %67)::Any
+│     %87  = PlayingCards.ArgumentError(%86)::Any
+│            PlayingCards.throw(%87)::Union{}
+└────        unreachable
+22 ──        goto #23
+23 ── %91  = (%24 === %84)::Bool
+└────        goto #42 if not %91
+24 ── %93  = Base.getfield(t, 4, true)::PlayingCards.Card
+│     %94  = Base.getfield(%93, :value)::UInt8
+│     %95  = Base.and_int(0x30, %94)::UInt8
+│     %96  = Base.lshr_int(%95, 0x0000000000000004)::UInt8
+│     %97  = Base.shl_int(%95, 0xfffffffffffffffc)::UInt8
+│     %98  = Base.ifelse(true, %96, %97)::UInt8
+│     %99  = Base.slt_int(0, 0)::Bool
+│     %100 = Base.bitcast(UInt64, 0)::UInt64
+│     %101 = Core.zext_int(Core.UInt64, %98)::UInt64
+│     %102 = Base.ule_int(%100, %101)::Bool
+│     %103 = Base.or_int(%99, %102)::Bool
+└────        goto #26 if not %103
+25 ── %105 = Base.sle_int(0, 3)::Bool
+│     %106 = Base.bitcast(UInt64, 3)::UInt64
+│     %107 = Core.zext_int(Core.UInt64, %98)::UInt64
+│     %108 = Base.ule_int(%107, %106)::Bool
+│     %109 = Base.and_int(%105, %108)::Bool
+└────        goto #27
+26 ──        nothing::Nothing
+27 ┄─ %112 = φ (#25 =&gt; %109, #26 =&gt; false)::Bool
+└────        goto #29 if not %112
+28 ── %114 = PlayingCards.Suit::Type{PlayingCards.Suit}
+│     %115 = %new(%114, %98)::PlayingCards.Suit
+└────        goto #30
+29 ── %117 = Base.string(&quot;invalid suit number: &quot;, %98)::Any
+│     %118 = PlayingCards.ArgumentError(%117)::Any
+│            PlayingCards.throw(%118)::Union{}
+└────        unreachable
+30 ──        goto #31
+31 ── %122 = (%84 === %115)::Bool
+└────        goto #40 if not %122
+32 ── %124 = Base.getfield(t, 5, true)::PlayingCards.Card
+│     %125 = Base.getfield(%124, :value)::UInt8
+│     %126 = Base.and_int(0x30, %125)::UInt8
+│     %127 = Base.lshr_int(%126, 0x0000000000000004)::UInt8
+│     %128 = Base.shl_int(%126, 0xfffffffffffffffc)::UInt8
+│     %129 = Base.ifelse(true, %127, %128)::UInt8
+│     %130 = Base.slt_int(0, 0)::Bool
+│     %131 = Base.bitcast(UInt64, 0)::UInt64
+│     %132 = Core.zext_int(Core.UInt64, %129)::UInt64
+│     %133 = Base.ule_int(%131, %132)::Bool
+│     %134 = Base.or_int(%130, %133)::Bool
+└────        goto #34 if not %134
+33 ── %136 = Base.sle_int(0, 3)::Bool
+│     %137 = Base.bitcast(UInt64, 3)::UInt64
+│     %138 = Core.zext_int(Core.UInt64, %129)::UInt64
+│     %139 = Base.ule_int(%138, %137)::Bool
+│     %140 = Base.and_int(%136, %139)::Bool
+└────        goto #35
+34 ──        nothing::Nothing
+35 ┄─ %143 = φ (#33 =&gt; %140, #34 =&gt; false)::Bool
+└────        goto #37 if not %143
+36 ── %145 = PlayingCards.Suit::Type{PlayingCards.Suit}
+│     %146 = %new(%145, %129)::PlayingCards.Suit
+└────        goto #38
+37 ── %148 = Base.string(&quot;invalid suit number: &quot;, %129)::Any
+│     %149 = PlayingCards.ArgumentError(%148)::Any
+│            PlayingCards.throw(%149)::Union{}
+└────        unreachable
+38 ──        goto #39
+39 ── %153 = (%115 === %146)::Bool
+└────        goto #41
+40 ──        nothing::Nothing
+41 ┄─ %156 = φ (#39 =&gt; %153, #40 =&gt; false)::Bool
+└────        goto #43
+42 ──        nothing::Nothing
+43 ┄─ %159 = φ (#41 =&gt; %156, #42 =&gt; false)::Bool
+└────        goto #45
+44 ──        nothing::Nothing
+45 ┄─ %162 = φ (#43 =&gt; %159, #44 =&gt; false)::Bool
+└────        goto #100 if not %162
+46 ── %164 = Base.getfield(t, 1, false)::PlayingCards.Card
+│     %165 = Base.getfield(%164, :value)::UInt8
+│     %166 = Base.and_int(%165, 0x0f)::UInt8
+│     %167 = Core.lshr_int(%166, 7)::UInt8
+│     %168 = Core.eq_int(%167, 0x01)::Bool
+└────        goto #48 if not %168
+47 ──        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %166::UInt8)::Union{}
+└────        unreachable
+48 ──        goto #49
+49 ── %173 = Core.bitcast(Core.Int8, %166)::Int8
+└────        goto #50
+50 ──        goto #51
+51 ──        goto #52
+52 ── %177 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %178 = Core.sext_int(Core.Int64, %173)::Int64
+│     %179 = Base.getfield(%177, %178, true)::Int64
+└────        goto #53
+53 ──        goto #54
+54 ──        goto #55
+55 ──        goto #56
+56 ── %184 = Base.getfield(t, 2, false)::PlayingCards.Card
+│     %185 = Base.getfield(%184, :value)::UInt8
+│     %186 = Base.and_int(%185, 0x0f)::UInt8
+│     %187 = Core.lshr_int(%186, 7)::UInt8
+│     %188 = Core.eq_int(%187, 0x01)::Bool
+└────        goto #58 if not %188
+57 ──        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %186::UInt8)::Union{}
+└────        unreachable
+58 ──        goto #59
+59 ── %193 = Core.bitcast(Core.Int8, %186)::Int8
+└────        goto #60
+60 ──        goto #61
+61 ──        goto #62
+62 ── %197 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %198 = Core.sext_int(Core.Int64, %193)::Int64
+│     %199 = Base.getfield(%197, %198, true)::Int64
+└────        goto #63
+63 ──        goto #64
+64 ──        goto #65
+65 ──        goto #66
+66 ── %204 = Base.getfield(t, 3, false)::PlayingCards.Card
+│     %205 = Base.getfield(%204, :value)::UInt8
+│     %206 = Base.and_int(%205, 0x0f)::UInt8
+│     %207 = Core.lshr_int(%206, 7)::UInt8
+│     %208 = Core.eq_int(%207, 0x01)::Bool
+└────        goto #68 if not %208
+67 ──        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %206::UInt8)::Union{}
+└────        unreachable
+68 ──        goto #69
+69 ── %213 = Core.bitcast(Core.Int8, %206)::Int8
+└────        goto #70
+70 ──        goto #71
+71 ──        goto #72
+72 ── %217 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %218 = Core.sext_int(Core.Int64, %213)::Int64
+│     %219 = Base.getfield(%217, %218, true)::Int64
+└────        goto #73
+73 ──        goto #74
+74 ──        goto #75
+75 ──        goto #76
+76 ── %224 = Base.getfield(t, 4, false)::PlayingCards.Card
+│     %225 = Base.getfield(%224, :value)::UInt8
+│     %226 = Base.and_int(%225, 0x0f)::UInt8
+│     %227 = Core.lshr_int(%226, 7)::UInt8
+│     %228 = Core.eq_int(%227, 0x01)::Bool
+└────        goto #78 if not %228
+77 ──        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %226::UInt8)::Union{}
+└────        unreachable
+78 ──        goto #79
+79 ── %233 = Core.bitcast(Core.Int8, %226)::Int8
+└────        goto #80
+80 ──        goto #81
+81 ──        goto #82
+82 ── %237 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %238 = Core.sext_int(Core.Int64, %233)::Int64
+│     %239 = Base.getfield(%237, %238, true)::Int64
+└────        goto #83
+83 ──        goto #84
+84 ──        goto #85
+85 ──        goto #86
+86 ── %244 = Base.getfield(t, 5, false)::PlayingCards.Card
+│     %245 = Base.getfield(%244, :value)::UInt8
+│     %246 = Base.and_int(%245, 0x0f)::UInt8
+│     %247 = Core.lshr_int(%246, 7)::UInt8
+│     %248 = Core.eq_int(%247, 0x01)::Bool
+└────        goto #88 if not %248
+87 ──        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %246::UInt8)::Union{}
+└────        unreachable
+88 ──        goto #89
+89 ── %253 = Core.bitcast(Core.Int8, %246)::Int8
+└────        goto #90
+90 ──        goto #91
+91 ──        goto #92
+92 ── %257 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %258 = Core.sext_int(Core.Int64, %253)::Int64
+│     %259 = Base.getfield(%257, %258, true)::Int64
+└────        goto #93
+93 ──        goto #94
+94 ──        goto #95
+95 ──        goto #96
+96 ──        goto #97
+97 ──        goto #98
+98 ──        goto #99
+99 ── %267 = Base.mul_int(%179, %199)::Int64
+│     %268 = Base.mul_int(%267, %219)::Int64
+│     %269 = Base.mul_int(%268, %239)::Int64
+│     %270 = Base.mul_int(%269, %259)::Int64
+│     %271 = invoke PokerHandEvaluator.Val(%270::Int64)::Val{_A} where _A
+│     %272 = PokerHandEvaluator.evaluate5_flush(%271)::Any
+│     %273 = Base.convert(%1, %272)::Any
+│            Core.typeassert(%273, %1)::Int64
+│     %275 = π (%273, Int64)
+└────        return %275
+100 ─ %277 = Base.getfield(t, 1, false)::PlayingCards.Card
+│     %278 = Base.getfield(%277, :value)::UInt8
+│     %279 = Base.and_int(%278, 0x0f)::UInt8
+│     %280 = Core.lshr_int(%279, 7)::UInt8
+│     %281 = Core.eq_int(%280, 0x01)::Bool
+└────        goto #102 if not %281
+101 ─        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %279::UInt8)::Union{}
+└────        unreachable
+102 ─        goto #103
+103 ─ %286 = Core.bitcast(Core.Int8, %279)::Int8
+└────        goto #104
+104 ─        goto #105
+105 ─        goto #106
+106 ─ %290 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %291 = Core.sext_int(Core.Int64, %286)::Int64
+│     %292 = Base.getfield(%290, %291, true)::Int64
+└────        goto #107
+107 ─        goto #108
+108 ─        goto #109
+109 ─        goto #110
+110 ─ %297 = Base.getfield(t, 2, false)::PlayingCards.Card
+│     %298 = Base.getfield(%297, :value)::UInt8
+│     %299 = Base.and_int(%298, 0x0f)::UInt8
+│     %300 = Core.lshr_int(%299, 7)::UInt8
+│     %301 = Core.eq_int(%300, 0x01)::Bool
+└────        goto #112 if not %301
+111 ─        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %299::UInt8)::Union{}
+└────        unreachable
+112 ─        goto #113
+113 ─ %306 = Core.bitcast(Core.Int8, %299)::Int8
+└────        goto #114
+114 ─        goto #115
+115 ─        goto #116
+116 ─ %310 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %311 = Core.sext_int(Core.Int64, %306)::Int64
+│     %312 = Base.getfield(%310, %311, true)::Int64
+└────        goto #117
+117 ─        goto #118
+118 ─        goto #119
+119 ─        goto #120
+120 ─ %317 = Base.getfield(t, 3, false)::PlayingCards.Card
+│     %318 = Base.getfield(%317, :value)::UInt8
+│     %319 = Base.and_int(%318, 0x0f)::UInt8
+│     %320 = Core.lshr_int(%319, 7)::UInt8
+│     %321 = Core.eq_int(%320, 0x01)::Bool
+└────        goto #122 if not %321
+121 ─        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %319::UInt8)::Union{}
+└────        unreachable
+122 ─        goto #123
+123 ─ %326 = Core.bitcast(Core.Int8, %319)::Int8
+└────        goto #124
+124 ─        goto #125
+125 ─        goto #126
+126 ─ %330 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %331 = Core.sext_int(Core.Int64, %326)::Int64
+│     %332 = Base.getfield(%330, %331, true)::Int64
+└────        goto #127
+127 ─        goto #128
+128 ─        goto #129
+129 ─        goto #130
+130 ─ %337 = Base.getfield(t, 4, false)::PlayingCards.Card
+│     %338 = Base.getfield(%337, :value)::UInt8
+│     %339 = Base.and_int(%338, 0x0f)::UInt8
+│     %340 = Core.lshr_int(%339, 7)::UInt8
+│     %341 = Core.eq_int(%340, 0x01)::Bool
+└────        goto #132 if not %341
+131 ─        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %339::UInt8)::Union{}
+└────        unreachable
+132 ─        goto #133
+133 ─ %346 = Core.bitcast(Core.Int8, %339)::Int8
+└────        goto #134
+134 ─        goto #135
+135 ─        goto #136
+136 ─ %350 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %351 = Core.sext_int(Core.Int64, %346)::Int64
+│     %352 = Base.getfield(%350, %351, true)::Int64
+└────        goto #137
+137 ─        goto #138
+138 ─        goto #139
+139 ─        goto #140
+140 ─ %357 = Base.getfield(t, 5, false)::PlayingCards.Card
+│     %358 = Base.getfield(%357, :value)::UInt8
+│     %359 = Base.and_int(%358, 0x0f)::UInt8
+│     %360 = Core.lshr_int(%359, 7)::UInt8
+│     %361 = Core.eq_int(%360, 0x01)::Bool
+└────        goto #142 if not %361
+141 ─        invoke Core.throw_inexacterror(:check_top_bit::Symbol, Int8::Type{Int8}, %359::UInt8)::Union{}
+└────        unreachable
+142 ─        goto #143
+143 ─ %366 = Core.bitcast(Core.Int8, %359)::Int8
+└────        goto #144
+144 ─        goto #145
+145 ─        goto #146
+146 ─ %370 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│     %371 = Core.sext_int(Core.Int64, %366)::Int64
+│     %372 = Base.getfield(%370, %371, true)::Int64
+└────        goto #147
+147 ─        goto #148
+148 ─        goto #149
+149 ─        goto #150
+150 ─        goto #151
+151 ─        goto #152
+152 ─        goto #153
+153 ─ %380 = Base.mul_int(%292, %312)::Int64
+│     %381 = Base.mul_int(%380, %332)::Int64
+│     %382 = Base.mul_int(%381, %352)::Int64
+│     %383 = Base.mul_int(%382, %372)::Int64
+│     %384 = invoke PokerHandEvaluator.Val(%383::Int64)::Val{_A} where _A
+│     %385 = PokerHandEvaluator.evaluate5_offsuit(%384)::Any
+│     %386 = Base.convert(%1, %385)::Any
+│            Core.typeassert(%386, %1)::Int64
+│     %388 = π (%386, Int64)
+└────        return %388
+) =&gt; Int64</pre><pre><code class="language-julia">@btime PokerHandEvaluator.evaluate5($(A♡, A♣, A♠, 3♡, 2♢))
+nothing</code></pre><pre class="documenter-example-output">  0.001 ns (0 allocations: 0 bytes)</pre><p><code>eval</code>ing methods for all unique hands is a bit expensive for the compiler as there are many method definitions. This timing may not be representative of what users should expect, however. Running PokerHandEvaluator.jl&#39;s <code>perf.jl</code> file shows that performance is around 2 μs:</p><pre><code class="language-julia">using PokerHandEvaluator
+phe_dir = dirname(dirname(pathof(PokerHandEvaluator)))
+include(joinpath(phe_dir, &quot;perf.jl&quot;)) # compile first
+include(joinpath(phe_dir, &quot;perf.jl&quot;))</code></pre><pre class="documenter-example-output">Δt_per_hand_eval = 9.06468425e-6
+Δt_per_hand_eval = 8.0650375e-7</pre><p><code>perf.jl</code> is configured to evaluate roughly 4% of all possible hands, but this can easily be adjusted.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../implementation/">« Implementation</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.3 on <span class="colophon-date" title="Wednesday 30 June 2021 14:25">Wednesday 30 June 2021</span>. Using Julia version 1.6.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
