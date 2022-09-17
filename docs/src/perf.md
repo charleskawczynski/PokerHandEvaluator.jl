@@ -22,6 +22,5 @@ There is a [`perf.jl`](https://github.com/charleskawczynski/PokerHandEvaluator.j
 
 ```@example
 using PokerHandEvaluator
-phe_dir = dirname(dirname(pathof(PokerHandEvaluator)));
-@time include(joinpath(phe_dir, "perf.jl"))
+@time include(joinpath(pkgdir(PokerHandEvaluator), "perf.jl"))
 ```
