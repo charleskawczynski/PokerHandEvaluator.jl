@@ -73,8 +73,7 @@ Here's a code snippet to see performance
 
 ```julia
 using PokerHandEvaluator
-phe_dir = dirname(dirname(pathof(PokerHandEvaluator)));
-include(joinpath(phe_dir, "perf.jl"))
+include(joinpath(pkgdir(PokerHandEvaluator), "perf.jl"))
 ```
 
 Running this gives:
@@ -82,9 +81,7 @@ Running this gives:
 ```julia
 julia> using PokerHandEvaluator
 
-julia> phe_dir = dirname(dirname(pathof(PokerHandEvaluator)));
-
-julia> include(joinpath(phe_dir, "perf.jl"))
+julia> include(joinpath(pkgdir(PokerHandEvaluator), "perf.jl"))
 Δt_per_evaluate5 = 2.0215967156093207e-8
 *******5-card hand evaluation benchmark*******
 BechmarkTools.Trial: 10000 samples with 195 evaluations.
