@@ -28,10 +28,12 @@ evaluate5(cards::Card...)::Int = evaluate5(cards)
 # based on flush/non-flush:
 function evaluate5(t::NTuple{N,Card})::Int where {N}
     @assert N == 5
-    if suit(t[1]) == suit(t[2]) == suit(t[3]) == suit(t[4]) == suit(t[5])
-        return hash_table_suited[prod(prime.(t))]
-    else
-        return hash_table_offsuit[prod(prime.(t))]
+    @inbounds begin
+        if suit(t[1]) == suit(t[2]) == suit(t[3]) == suit(t[4]) == suit(t[5])
+            return hash_table_suited[prod(prime, t)]
+        else
+            return hash_table_offsuit[prod(prime, t)]
+        end
     end
 end
 

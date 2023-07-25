@@ -22,32 +22,34 @@ function min_hand_rank_compact(hand_rank_1, cards)
 end
 
 function best_hand_rank_from_7_cards_full(c)
-    cards=(c[1],c[2],c[3],c[4],c[5]) # first combination
+    @inbounds begin
+        cards=(c[1],c[2],c[3],c[4],c[5]) # first combination
 
-    hand_rank = evaluate5(cards)
-    hand_type = hand_type_binary_search(hand_rank)
-    hr = (hand_rank, hand_type, cards)
+        hand_rank = evaluate5(cards)
+        hand_type = hand_type_binary_search(hand_rank)
+        hr = (hand_rank, hand_type, cards)
 
-    cards=(c[1],c[2],c[3],c[4],c[6]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[3],c[4],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[3],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[3],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[3],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[4],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[4],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[4],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[2],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[3],c[4],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[3],c[4],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[3],c[4],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[3],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[1],c[4],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[2],c[3],c[4],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[2],c[3],c[4],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[2],c[3],c[4],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[2],c[3],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[2],c[4],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
-    cards=(c[3],c[4],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[3],c[4],c[6]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[3],c[4],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[3],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[3],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[3],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[4],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[4],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[4],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[2],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[3],c[4],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[3],c[4],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[3],c[4],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[3],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[1],c[4],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[2],c[3],c[4],c[5],c[6]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[2],c[3],c[4],c[5],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[2],c[3],c[4],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[2],c[3],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[2],c[4],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+        cards=(c[3],c[4],c[5],c[6],c[7]); hr = min_hand_rank_full(hr, cards)
+    end
     return hr
 end
 
