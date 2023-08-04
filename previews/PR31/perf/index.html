@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Performance · PokerHandEvaluator.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">PokerHandEvaluator.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../implementation/">Implementation</a></li><li class="is-active"><a class="tocitem" href>Performance</a></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Performance</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Performance</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/charleskawczynski/PokerHandEvaluator.jl/blob/master/docs/src/perf.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Performance"><a class="docs-heading-anchor" href="#Performance">Performance</a><a id="Performance-1"></a><a class="docs-heading-anchor-permalink" href="#Performance" title="Permalink"></a></h1><p>There is a <a href="https://github.com/charleskawczynski/PokerHandEvaluator.jl/blob/main/perf.jl"><code>perf.jl</code></a> file at the top level of the repo which roughly estimates PokerHandEvaluator.jl&#39;s performance. Here is a snapshot example of using <a href="https://github.com/JuliaCI/BenchmarkTools.jl"><code>BenchmarkTools</code></a> on PokerHandEvaluator.jl&#39;s base evaluation method <a href="../api/#PokerHandEvaluator.evaluate5"><code>evaluate5</code></a>:</p><pre><code class="language-julia">using BenchmarkTools, InteractiveUtils
+using PlayingCards, PokerHandEvaluator
+@code_typed PokerHandEvaluator.evaluate5((A♡, A♣, A♠, 3♡, 2♢))</code></pre><pre class="documenter-example-output">CodeInfo(
+1 ─ %1  = Base.getfield(t, 1, false)::PlayingCards.Card{PlayingCards.Heart}
+│   %2  = Base.getfield(%1, :rank)::UInt8
+│   %3  = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│   %4  = Core.zext_int(Core.Int64, %2)::Int64
+│   %5  = Base.getfield(%3, %4, true)::Int64
+│   %6  = Base.getfield(t, 2, false)::PlayingCards.Card{PlayingCards.Club}
+│   %7  = Base.getfield(%6, :rank)::UInt8
+│   %8  = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│   %9  = Core.zext_int(Core.Int64, %7)::Int64
+│   %10 = Base.getfield(%8, %9, true)::Int64
+│   %11 = Base.getfield(t, 3, false)::PlayingCards.Card{PlayingCards.Spade}
+│   %12 = Base.getfield(%11, :rank)::UInt8
+│   %13 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│   %14 = Core.zext_int(Core.Int64, %12)::Int64
+│   %15 = Base.getfield(%13, %14, true)::Int64
+│   %16 = Base.getfield(t, 4, false)::PlayingCards.Card{PlayingCards.Heart}
+│   %17 = Base.getfield(%16, :rank)::UInt8
+│   %18 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│   %19 = Core.zext_int(Core.Int64, %17)::Int64
+│   %20 = Base.getfield(%18, %19, true)::Int64
+│   %21 = Base.getfield(t, 5, false)::PlayingCards.Card{PlayingCards.Diamond}
+│   %22 = Base.getfield(%21, :rank)::UInt8
+│   %23 = PokerHandEvaluator.HandCombinations.primes::NTuple{13, Int64}
+│   %24 = Core.zext_int(Core.Int64, %22)::Int64
+│   %25 = Base.getfield(%23, %24, true)::Int64
+│   %26 = Base.mul_int(%5, %10)::Int64
+│   %27 = Base.mul_int(%26, %15)::Int64
+│   %28 = Base.mul_int(%27, %20)::Int64
+│   %29 = Base.mul_int(%28, %25)::Int64
+│   %30 = invoke PokerHandEvaluator.Val(%29::Int64)::Val{_A} where _A
+│   %31 = PokerHandEvaluator.evaluate5_offsuit(%30)::Any
+└──       return %31
+) =&gt; Any</pre><pre><code class="language-julia">@btime PokerHandEvaluator.evaluate5($(A♡, A♣, A♠, 3♡, 2♢))
+nothing</code></pre><pre class="documenter-example-output">  0.001 ns (0 allocations: 0 bytes)</pre><p><code>eval</code>ing methods for all unique hands is a bit expensive for the compiler as there are many method definitions. This timing may not be representative of what users should expect, however. Running PokerHandEvaluator.jl&#39;s <code>perf.jl</code> file shows that performance is around 2 μs:</p><pre><code class="language-julia">using PokerHandEvaluator
+phe_dir = dirname(dirname(pathof(PokerHandEvaluator)))
+include(joinpath(phe_dir, &quot;perf.jl&quot;)) # compile first
+include(joinpath(phe_dir, &quot;perf.jl&quot;))</code></pre><pre class="documenter-example-output">Δt_per_hand_eval = 1.780349549e-5
+Δt_per_hand_eval = 8.3780224e-7</pre><p><code>perf.jl</code> is configured to evaluate roughly 4% of all possible hands, but this can easily be adjusted.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../implementation/">« Implementation</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 22 June 2021 03:17">Tuesday 22 June 2021</span>. Using Julia version 1.6.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
